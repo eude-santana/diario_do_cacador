@@ -20,7 +20,7 @@ CREATE TABLE usuario (
   id_usuario INT UNSIGNED AUTO_INCREMENT,
   nome_exibicao VARCHAR(100) NOT NULL,
   email VARCHAR(255) NOT NULL,
-  senha_hash VARCHAR(255) NOT NULL,
+  senha VARCHAR(255) NOT NULL,
   ativo BOOLEAN NOT NULL DEFAULT TRUE,
 
   CONSTRAINT pk_usuario
