@@ -5,8 +5,8 @@ require_once __DIR__ . "/Models/Usuario.php";
 $usuario = new Usuario();
 
 $resultado = $usuario->cadastrar(
-    "cacador_teste",
-    "teste@diariodocacador.com",
+    "Caçador Teste",
+    "cacador.teste@exemplo.com",
     "123456"
 );
 
