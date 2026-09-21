@@ -140,7 +140,7 @@ switch ($acao) {
 
         if ($nome === "") {
             $erro = "Informe o nome da vantagem.";
-        } elseif (mb_strlen($nome) > 100) {
+        } elseif (strlen($nome) > 100) {
             $erro = "O nome deve possuir no máximo 100 caracteres.";
         } elseif (!in_array($tipo, $tiposPermitidos, true)) {
             $erro = "O tipo de vantagem informado é inválido.";
@@ -298,7 +298,7 @@ switch ($acao) {
             $erro = "Vantagem não encontrada.";
         } elseif ($nome === "") {
             $erro = "Informe o nome da vantagem.";
-        } elseif (mb_strlen($nome) > 100) {
+        } elseif (strlen($nome) > 100) {
             $erro = "O nome deve possuir no máximo 100 caracteres.";
         } elseif (!in_array($tipo, $tiposPermitidos, true)) {
             $erro = "O tipo de vantagem informado é inválido.";
