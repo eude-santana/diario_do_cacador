@@ -14,9 +14,7 @@ $sucesso = $_GET["sucesso"] ?? "";
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Cadastrar item — Diário do Caçador</title>
 </head>
@@ -31,7 +29,7 @@ $sucesso = $_GET["sucesso"] ?? "";
     <?php if ($erro === "nome"): ?>
         <p>Informe o nome do item.</p>
     <?php elseif ($erro === "nome_longo"): ?>
-        <p>O nome deve possuir no máximo 100 caracteres.</p>
+        <p>O nome informado excede o limite permitido. Use um nome menor.</p>
     <?php elseif ($erro === "cadastro"): ?>
         <p>Não foi possível cadastrar o item.</p>
     <?php endif; ?>
@@ -42,24 +40,13 @@ $sucesso = $_GET["sucesso"] ?? "";
         <div>
             <label for="nome">Nome:</label>
 
-            <input
-                type="text"
-                id="nome"
-                name="nome"
-                maxlength="100"
-                required
-            >
+            <input type="text" id="nome" name="nome" maxlength="100" required>
         </div>
 
         <div>
             <label for="descricao">Descrição:</label>
 
-            <textarea
-                id="descricao"
-                name="descricao"
-                rows="5"
-                cols="40"
-            ></textarea>
+            <textarea id="descricao" name="descricao" rows="5" cols="40"></textarea>
         </div>
 
         <button type="submit">Cadastrar</button>

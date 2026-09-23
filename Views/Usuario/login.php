@@ -24,30 +24,21 @@ $erro = $_GET["erro"] ?? "";
         <p>E-mail ou senha incorretos.</p>
     <?php elseif ($erro === "usuario_inativo"): ?>
         <p>Este usuário está inativo.</p>
+    <?php elseif ($erro === "consulta"): ?>
+        <p>Não foi possível realizar o login. Tente novamente mais tarde.</p>
     <?php endif; ?>
 
     <form action="../../Controllers/LoginController.php" method="POST">
         <div>
             <label for="email">E-mail:</label>
 
-            <input
-                type="email"
-                id="email"
-                name="email"
-                maxlength="255"
-                required
-            >
+            <input type="email" id="email" name="email" maxlength="255" required>
         </div>
 
         <div>
             <label for="senha">Senha:</label>
 
-            <input
-                type="password"
-                id="senha"
-                name="senha"
-                required
-            >
+            <input type="password" id="senha" name="senha" required>
         </div>
 
         <button type="submit">Entrar</button>

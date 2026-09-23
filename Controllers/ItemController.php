@@ -19,8 +19,16 @@ if ($acao === "listar") {
 }
 
 if ($acao === "cadastrar" && $_SERVER["REQUEST_METHOD"] === "POST") {
-    $nome = trim($_POST["nome"] ?? "");
-    $descricao = trim($_POST["descricao"] ?? "");
+    $nome = $_POST["nome"] ?? "";
+    $descricao = $_POST["descricao"] ?? "";
+
+    if (!is_string($nome) || !is_string($descricao)) {
+        header("Location: ../Views/Item/cadastro.php?erro=cadastro");
+        exit;
+    }
+
+    $nome = trim($nome);
+    $descricao = trim($descricao);
 
     if ($nome === "") {
         header("Location: ../Views/Item/cadastro.php?erro=nome");
@@ -32,19 +40,25 @@ if ($acao === "cadastrar" && $_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    $resultado = $itemModel->cadastrar(
-        $nome,
-        $descricao,
-        $_SESSION["id_usuario"]
-    );
+    try {
+        $resultado = $itemModel->cadastrar(
+            $nome,
+            $descricao,
+            $_SESSION["id_usuario"]
+        );
 
-    if ($resultado) {
-        header("Location: ../Views/Item/cadastro.php?sucesso=1");
-        exit;
+        if ($resultado) {
+            header("Location: ../Views/Item/cadastro.php?sucesso=1");
+            exit;
+        }
+
+    } catch (PDOException $erro) {
+        error_log($erro->getMessage());
     }
 
     header("Location: ../Views/Item/cadastro.php?erro=cadastro");
     exit;
+
 }
 
 if ($acao === "editar" && $_SERVER["REQUEST_METHOD"] === "GET") {
@@ -68,8 +82,16 @@ if ($acao === "editar" && $_SERVER["REQUEST_METHOD"] === "GET") {
 
 if ($acao === "atualizar" && $_SERVER["REQUEST_METHOD"] === "POST") {
     $idItem = (int) ($_POST["id_item"] ?? 0);
-    $nome = trim($_POST["nome"] ?? "");
-    $descricao = trim($_POST["descricao"] ?? "");
+    $nome = $_POST["nome"] ?? "";
+    $descricao = $_POST["descricao"] ?? "";
+
+    if (!is_string($nome) || !is_string($descricao)) {
+        header("Location: ItemController.php?acao=listar&erro=dados");
+        exit;
+    }
+
+    $nome = trim($nome);
+    $descricao = trim($descricao);
 
     if ($idItem <= 0 || $nome === "") {
         header(
@@ -87,23 +109,38 @@ if ($acao === "atualizar" && $_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
-    $resultado = $itemModel->atualizar(
-        $idItem,
-        $nome,
-        $descricao,
-        $_SESSION["id_usuario"]
-    );
-
-    if ($resultado) {
-        header(
-            "Location: ItemController.php?acao=listar&sucesso=atualizado"
+    try {
+        $item = $itemModel->buscarPorId(
+            $idItem,
+            $_SESSION["id_usuario"]
         );
-        exit;
+
+        if (!$item) {
+            header(
+                "Location: ItemController.php?acao=listar&erro=item_nao_encontrado"
+            );
+            exit;
+        }
+
+        $resultado = $itemModel->atualizar(
+            $idItem,
+            $nome,
+            $descricao,
+            $_SESSION["id_usuario"]
+        );
+
+        if ($resultado) {
+            header(
+                "Location: ItemController.php?acao=listar&sucesso=atualizado"
+            );
+            exit;
+        }
+
+    } catch (PDOException $erro) {
+        error_log($erro->getMessage());
     }
 
-    header(
-        "Location: ItemController.php?acao=editar&id=".$idItem."&erro=atualizacao"
-    );
+    header("Location: ItemController.php?acao=editar&id=" . $idItem . "&erro=atualizacao");
     exit;
 }
 

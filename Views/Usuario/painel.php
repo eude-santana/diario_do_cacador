@@ -1,26 +1,9 @@
-// arquivo temporario para testar a sessão do usuário
 <?php
 
 require_once __DIR__ . "/../../Config/Autenticacao.php";
 
 exigirLogin();
 ?>
-
-<?php
-
-if (session_status() !== PHP_SESSION_ACTIVE) {
-    session_start();
-}
-
-if (!isset($_SESSION["id_usuario"])) {
-    header("Location: login.php");
-    exit;
-}
-?>
-
-<form action="../../Controllers/LogoutController.php" method="POST">
-    <button type="submit">Sair</button>
-</form>
 
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -41,6 +24,10 @@ if (!isset($_SESSION["id_usuario"])) {
     </p>
 
     <p>Login realizado com sucesso.</p>
+
+    <form action="../../Controllers/LogoutController.php" method="POST">
+        <button type="submit">Sair</button>
+    </form>
 </body>
 
 </html>

@@ -1,13 +1,22 @@
+<?php
+
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($itens)) {
+    header("Location: /Controllers/ItemController.php?acao=listar");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
 <head>
     <meta charset="UTF-8">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Meus itens — Diário do Caçador</title>
 </head>
@@ -66,27 +75,22 @@
                         </td>
 
                         <td>
-                            <a
-                                href="/Controllers/ItemController.php?acao=editar&id=<?php
-                                echo $item["id_item"];
-                                ?>"
-                            >
+                            <a href="/Controllers/ItemController.php?acao=editar&id=<?php
+                            echo $item["id_item"];
+                            ?>">
                                 Editar
                             </a>
 
-                            <form action="/Controllers/ItemController.php" method="POST" 
-                            onsubmit="return confirm('Deseja realmente excluir este item?');">
+                            <form action="/Controllers/ItemController.php" method="POST"
+                                onsubmit="return confirm('Deseja realmente excluir este item?');">
                                 <input type="hidden" name="acao" value="excluir">
 
-                                <input
-                                    type="hidden"
-                                    name="id_item"
-                                    value="<?php echo $item["id_item"]; ?>">
+                                <input type="hidden" name="id_item" value="<?php echo $item["id_item"]; ?>">
 
                                 <button type="submit">Excluir</button>
                             </form>
                         </td>
-                        
+
                     </tr>
                 <?php endforeach; ?>
             </tbody>

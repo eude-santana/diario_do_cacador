@@ -12,7 +12,7 @@ $magiaModel = new Magia();
 $companheiroModel = new CompanheiroAnimal();
 
 $idAutor = (int) $_SESSION["id_usuario"];
-$acao = $_GET["acao"] ?? $_POST["acao"] ?? "listar";
+$acao = $_POST["acao"] ?? $_GET["acao"] ?? "listar";
 
 $tiposPermitidos = [
     "NORMAL",

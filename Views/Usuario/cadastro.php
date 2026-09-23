@@ -23,10 +23,12 @@ $sucesso = $_GET["sucesso"] ?? "";
 
     <?php if ($erro === "campos"): ?>
         <p>Preencha todos os campos.</p>
+    <?php elseif ($erro === "nome_invalido"): ?>
+        <p>O nome informado excede o limite permitido. Use um nome menor.</p>
     <?php elseif ($erro === "email_invalido"): ?>
-        <p>Informe um e-mail válido.</p>
+        <p>Informe um e-mail válido dentro do limite de 255 caracteres.</p>
     <?php elseif ($erro === "senha_curta"): ?>
-        <p>A senha deve possuir pelo menos 6 caracteres.</p>
+        <p>A senha informada é muito curta.</p>
     <?php elseif ($erro === "email_cadastrado"): ?>
         <p>Este e-mail já está cadastrado.</p>
     <?php elseif ($erro === "cadastro"): ?>
@@ -37,41 +39,27 @@ $sucesso = $_GET["sucesso"] ?? "";
         <div>
             <label for="nome">Nome:</label>
 
-            <input
-                type="text"
-                id="nome"
-                name="nome"
-                maxlength="100"
-                required
-            >
+            <input type="text" id="nome" name="nome" maxlength="100" required>
         </div>
 
         <div>
             <label for="email">E-mail:</label>
 
-            <input
-                type="email"
-                id="email"
-                name="email"
-                maxlength="255"
-                required
-            >
+            <input type="email" id="email" name="email" maxlength="255" required>
         </div>
 
         <div>
             <label for="senha">Senha:</label>
 
-            <input
-                type="password"
-                id="senha"
-                name="senha"
-                minlength="6"
-                required
-            >
+            <input type="password" id="senha" name="senha" minlength="6" required>
         </div>
 
         <button type="submit">Cadastrar</button>
     </form>
+    <p>
+        Já possui uma conta?
+        <a href="login.php">Entrar</a>
+    </p>
 </body>
 
 </html>

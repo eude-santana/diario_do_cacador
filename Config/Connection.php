@@ -23,7 +23,9 @@ class Connection
 
             return $conexao;
         } catch (PDOException $erro) {
-            die("Erro na conexão com o banco: " . $erro->getMessage());
+            error_log($erro->getMessage());
+
+            die("Não foi possível conectar ao banco de dados. Tente novamente mais tarde.");
         }
     }
 }

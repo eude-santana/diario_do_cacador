@@ -1,3 +1,17 @@
+<?php
+
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($companheiros)) {
+    header(
+        "Location: /Controllers/CompanheiroAnimalController.php?acao=listar"
+    );
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -75,7 +89,7 @@
                         </td>
 
                         <td>
-                            <?php if ($companheiro["dano"] !== ""): ?>
+                            <?php if (($companheiro["dano"] ?? "") !== ""): ?>
                                 <?php
                                 echo htmlspecialchars(
                                     $companheiro["dano"]

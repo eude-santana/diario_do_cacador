@@ -1,5 +1,14 @@
 <?php
 
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($magias) || !isset($companheiros)) {
+    header("Location: /Controllers/VantagemController.php?acao=novo");
+    exit;
+}
+
 $erro = $erro ?? "";
 $nome = $nome ?? "";
 $descricao = $descricao ?? "";
@@ -9,8 +18,7 @@ $magias = $magias ?? [];
 $companheiros = $companheiros ?? [];
 
 $idsMagiasSelecionadas = $idsMagiasSelecionadas ?? [];
-$idsCompanheirosSelecionados =
-    $idsCompanheirosSelecionados ?? [];
+$idsCompanheirosSelecionados = $idsCompanheirosSelecionados ?? [];
 
 ?>
 
@@ -42,20 +50,12 @@ $idsCompanheirosSelecionados =
             </p>
         <?php endif; ?>
 
-        <form
-            action="VantagemController.php"
-            method="POST"
-        >
-            <input
-                type="hidden"
-                name="acao"
-                value="cadastrar"
-            >
+
+        <form action="../../Controllers/VantagemController.php" method="POST">
+            <input type="hidden" name="acao" value="cadastrar">
 
             <div>
-                <label for="nome">
-                    Nome:
-                </label>
+                <label for="nome">Nome:</label>
 
                 <input
                     type="text"
@@ -143,7 +143,7 @@ $idsCompanheirosSelecionados =
                         Nenhuma magia cadastrada.
                     </p>
 
-                    <a href="../Controllers/MagiaController.php?acao=novo">
+                    <a href="/Views/Magia/cadastro.php">
                         Cadastrar magia
                     </a>
                 <?php else: ?>
@@ -188,11 +188,10 @@ $idsCompanheirosSelecionados =
                         Nenhum companheiro animal cadastrado.
                     </p>
 
-                    <a
-                        href="../Controllers/CompanheiroAnimalController.php?acao=novo"
-                    >
+                    <a href="/Views/CompanheiroAnimal/cadastro.php">
                         Cadastrar companheiro animal
                     </a>
+                    
                 <?php else: ?>
                     <?php foreach ($companheiros as $companheiro): ?>
                         <?php

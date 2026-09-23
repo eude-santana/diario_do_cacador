@@ -1,5 +1,14 @@
 <?php
 
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($vantagem)) {
+    header("Location: /Controllers/VantagemController.php?acao=listar");
+    exit;
+}
+
 $erro = $erro ?? "";
 $vantagem = $vantagem ?? [];
 

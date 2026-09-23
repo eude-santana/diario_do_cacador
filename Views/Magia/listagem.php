@@ -1,3 +1,15 @@
+<?php
+
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($magias)) {
+    header("Location: /Controllers/MagiaController.php?acao=listar");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 

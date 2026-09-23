@@ -1,6 +1,13 @@
 <?php
 
-$vantagens = $vantagens ?? [];
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($vantagens)) {
+    header("Location: /Controllers/VantagemController.php?acao=listar");
+    exit;
+}
 
 $mensagensSucesso = [
     "cadastro" => "Vantagem cadastrada com sucesso.",

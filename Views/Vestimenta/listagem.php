@@ -1,3 +1,15 @@
+<?php
+
+require_once __DIR__ . "/../../Config/Autenticacao.php";
+
+exigirLogin();
+
+if (!isset($vestimentas)) {
+    header("Location: /Controllers/VestimentaController.php?acao=listar");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 
@@ -95,7 +107,7 @@
                         </td>
 
                         <td>
-                            <?php if ($vestimenta["dano"] !== ""): ?>
+                            <?php if (($vestimenta["dano"] ?? "") !== ""): ?>
                                 <?php
                                 echo htmlspecialchars(
                                     $vestimenta["dano"]
@@ -107,7 +119,7 @@
                         </td>
 
                         <td>
-                            <?php if ($vestimenta["elemento"] !== ""): ?>
+                            <?php if (($vestimenta["elemento"] ?? "") !== ""): ?>
                                 <?php
                                 echo htmlspecialchars(
                                     $vestimenta["elemento"]
