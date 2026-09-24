@@ -14,18 +14,21 @@ class Item
 
     public function cadastrar(
         string $nome,
+        string $tipo,
         string $descricao,
         int $idAutor
     ): bool {
         $sql = "INSERT INTO item
-                    (nome, descricao, id_autor)
+                    (nome, tipo, descricao, id_autor)
                 VALUES
-                    (:nome, :descricao, :id_autor)";
+                    (:nome, :tipo, :descricao, :id_autor)";
 
         $comando = $this->conexao->prepare($sql);
 
         $comando->bindValue(":nome", $nome);
+        $comando->bindValue(":tipo", $tipo);
         $comando->bindValue(":descricao", $descricao);
+
         $comando->bindValue(
             ":id_autor",
             $idAutor,
@@ -40,6 +43,7 @@ class Item
         $sql = "SELECT
                     id_item,
                     nome,
+                    tipo,
                     descricao,
                     id_autor
                 FROM item
@@ -64,6 +68,7 @@ class Item
         $sql = "SELECT
                     id_item,
                     nome,
+                    tipo,
                     descricao,
                     id_autor
                 FROM item
@@ -92,24 +97,29 @@ class Item
     public function atualizar(
         int $idItem,
         string $nome,
+        string $tipo,
         string $descricao,
         int $idAutor
     ): bool {
         $sql = "UPDATE item
-                SET nome = :nome,
-                    descricao = :descricao
-                WHERE id_item = :id_item
-                AND id_autor = :id_autor";
+            SET nome = :nome,
+                tipo = :tipo,
+                descricao = :descricao
+            WHERE id_item = :id_item
+            AND id_autor = :id_autor";
 
         $comando = $this->conexao->prepare($sql);
 
         $comando->bindValue(":nome", $nome);
+        $comando->bindValue(":tipo", $tipo);
         $comando->bindValue(":descricao", $descricao);
+
         $comando->bindValue(
             ":id_item",
             $idItem,
             PDO::PARAM_INT
         );
+
         $comando->bindValue(
             ":id_autor",
             $idAutor,

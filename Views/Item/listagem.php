@@ -8,6 +8,13 @@ if (!isset($itens)) {
     header("Location: /Controllers/ItemController.php?acao=listar");
     exit;
 }
+
+$nomesTipos = [
+    "CONSUMIVEL" => "Consumível",
+    "MATERIAL" => "Material",
+    "UTILITARIO" => "Utilitário",
+    "OUTRO" => "Outro"
+];
 ?>
 
 <!DOCTYPE html>
@@ -54,6 +61,7 @@ if (!isset($itens)) {
             <thead>
                 <tr>
                     <th>Nome</th>
+                    <th>Tipo</th>
                     <th>Descrição</th>
                     <th>Ações</th>
                 </tr>
@@ -64,6 +72,12 @@ if (!isset($itens)) {
                     <tr>
                         <td>
                             <?php echo htmlspecialchars($item["nome"]); ?>
+                        </td>
+
+                        <td>
+                            <?php
+                            echo htmlspecialchars($nomesTipos[$item["tipo"]]);
+                            ?>
                         </td>
 
                         <td>

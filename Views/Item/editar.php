@@ -30,6 +30,8 @@ $erro = $_GET["erro"] ?? "";
         <p>O nome informado excede o limite permitido. Use um nome menor.</p>
     <?php elseif ($erro === "atualizacao"): ?>
         <p>Não foi possível atualizar o item.</p>
+    <?php elseif ($erro === "tipo"): ?>
+        <p>Selecione um tipo de item válido.</p>
     <?php endif; ?>
 
     <form action="/Controllers/ItemController.php" method="POST">
@@ -42,6 +44,36 @@ $erro = $_GET["erro"] ?? "";
 
             <input type="text" id="nome" name="nome" maxlength="100"
                 value="<?php echo htmlspecialchars($item["nome"]); ?>" required>
+        </div>
+
+        <div>
+            <label for="tipo">Tipo:</label>
+
+            <select id="tipo" name="tipo" required>
+                <option value="CONSUMIVEL" <?php
+                if ($item["tipo"] === "CONSUMIVEL") {
+                    echo "selected";
+                } ?>>Consumível
+                </option>
+
+                <option value="MATERIAL" <?php
+                if ($item["tipo"] === "MATERIAL") {
+                    echo "selected";
+                } ?>>Material
+                </option>
+
+                <option value="UTILITARIO" <?php
+                if ($item["tipo"] === "UTILITARIO") {
+                    echo "selected";
+                } ?>>Utilitário
+                </option>
+
+                <option value="OUTRO" <?php
+                if ($item["tipo"] === "OUTRO") {
+                    echo "selected";
+                } ?>>Outro
+                </option>
+            </select>
         </div>
 
         <div>

@@ -32,6 +32,8 @@ $sucesso = $_GET["sucesso"] ?? "";
         <p>O nome informado excede o limite permitido. Use um nome menor.</p>
     <?php elseif ($erro === "cadastro"): ?>
         <p>Não foi possível cadastrar o item.</p>
+    <?php elseif ($erro === "tipo"): ?>
+        <p>Selecione um tipo de item válido.</p>
     <?php endif; ?>
 
     <form action="../../Controllers/ItemController.php" method="POST">
@@ -41,6 +43,18 @@ $sucesso = $_GET["sucesso"] ?? "";
             <label for="nome">Nome:</label>
 
             <input type="text" id="nome" name="nome" maxlength="100" required>
+        </div>
+
+        <div>
+            <label for="tipo">Tipo:</label>
+
+            <select id="tipo" name="tipo" required>
+                <option value="">Selecione</option>
+                <option value="CONSUMIVEL">Consumível</option>
+                <option value="MATERIAL">Material</option>
+                <option value="UTILITARIO">Utilitário</option>
+                <option value="OUTRO">Outro</option>
+            </select>
         </div>
 
         <div>

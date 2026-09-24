@@ -9,6 +9,13 @@ $itemModel = new Item();
 
 $acao = $_POST["acao"] ?? $_GET["acao"] ?? "";
 
+$tiposPermitidos = [
+    "CONSUMIVEL",
+    "MATERIAL",
+    "UTILITARIO",
+    "OUTRO"
+];
+
 if ($acao === "listar") {
     $itens = $itemModel->listarPorAutor(
         $_SESSION["id_usuario"]
@@ -20,6 +27,7 @@ if ($acao === "listar") {
 
 if ($acao === "cadastrar" && $_SERVER["REQUEST_METHOD"] === "POST") {
     $nome = $_POST["nome"] ?? "";
+    $tipo = $_POST["tipo"] ?? "";
     $descricao = $_POST["descricao"] ?? "";
 
     if (!is_string($nome) || !is_string($descricao)) {
@@ -40,9 +48,16 @@ if ($acao === "cadastrar" && $_SERVER["REQUEST_METHOD"] === "POST") {
         exit;
     }
 
+
+    if (!in_array($tipo, $tiposPermitidos, true)) {
+        header("Location: ../Views/Item/cadastro.php?erro=tipo");
+        exit;
+    }
+
     try {
         $resultado = $itemModel->cadastrar(
             $nome,
+            $tipo,
             $descricao,
             $_SESSION["id_usuario"]
         );
@@ -83,6 +98,7 @@ if ($acao === "editar" && $_SERVER["REQUEST_METHOD"] === "GET") {
 if ($acao === "atualizar" && $_SERVER["REQUEST_METHOD"] === "POST") {
     $idItem = (int) ($_POST["id_item"] ?? 0);
     $nome = $_POST["nome"] ?? "";
+    $tipo = $_POST["tipo"] ?? "";
     $descricao = $_POST["descricao"] ?? "";
 
     if (!is_string($nome) || !is_string($descricao)) {
@@ -122,9 +138,15 @@ if ($acao === "atualizar" && $_SERVER["REQUEST_METHOD"] === "POST") {
             exit;
         }
 
+        if (!in_array($tipo, $tiposPermitidos, true)) {
+            header("Location: ItemController.php?acao=editar&id=" . $idItem . "&erro=tipo");
+            exit;
+        }
+
         $resultado = $itemModel->atualizar(
             $idItem,
             $nome,
+            $tipo,
             $descricao,
             $_SESSION["id_usuario"]
         );
