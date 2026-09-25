@@ -49,6 +49,13 @@ $nomesSlotsVestimenta = [
     "ESCUDO" => "Escudo"
 ];
 
+$nomesTiposItem = [
+    "CONSUMIVEL" => "Consumível",
+    "MATERIAL" => "Material",
+    "UTILITARIO" => "Utilitário",
+    "OUTRO" => "Outro"
+];
+
 ?>
 
 <!DOCTYPE html>
@@ -400,8 +407,8 @@ $nomesSlotsVestimenta = [
                 <legend>Itens iniciais</legend>
 
                 <p>
-                    Informe a quantidade inicial de cada item.
-                    Deixe zero para não incluir.
+                    Use os filtros para localizar os itens e informe
+                    somente as quantidades desejadas.
                 </p>
 
                 <?php if (empty($itensDisponiveis)): ?>
@@ -413,30 +420,87 @@ $nomesSlotsVestimenta = [
                         Cadastrar item
                     </a>
                 <?php else: ?>
-                    <?php foreach (
-                        $itensDisponiveis as $item
-                    ): ?>
-                        <?php
-                        $idItem = (int) $item["id_item"];
+                    <div>
+                        <label for="pesquisa_item">
+                            Pesquisar item:
+                        </label>
 
-                        $quantidade = (int) (
-                            $itensSelecionados[$idItem] ?? 0
-                        );
-                        ?>
+                        <input type="search" id="pesquisa_item" placeholder="Digite o nome do item">
+                    </div>
 
-                        <div>
-                            <label for="item_<?= $idItem ?>">
-                                <?= htmlspecialchars(
-                                    $item["nome"],
-                                    ENT_QUOTES,
-                                    "UTF-8"
-                                ) ?>:
-                            </label>
+                    <div>
+                        <label for="filtro_tipo_item">
+                            Tipo:
+                        </label>
 
-                            <input type="number" id="item_<?= $idItem ?>" name="itens[<?= $idItem ?>]" min="0"
-                                value="<?= $quantidade ?>">
-                        </div>
-                    <?php endforeach; ?>
+                        <select id="filtro_tipo_item">
+                            <option value="">
+                                Todos os tipos
+                            </option>
+
+                            <?php foreach (
+                                $nomesTiposItem as $valorTipo => $nomeTipo
+                            ): ?>
+                                <option value="<?= $valorTipo ?>">
+                                    <?= htmlspecialchars(
+                                        $nomeTipo,
+                                        ENT_QUOTES,
+                                        "UTF-8"
+                                    ) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
+                    <div id="lista_itens">
+                        <?php foreach ($itensDisponiveis as $item): ?>
+                            <?php
+                            $idItem = (int) $item["id_item"];
+
+                            $tipoItem = $item["tipo"] ?? "OUTRO";
+
+                            $nomeTipoItem =
+                                $nomesTiposItem[$tipoItem] ?? "Outro";
+
+                            $quantidade = (int) (
+                                $itensSelecionados[$idItem] ?? 0
+                            );
+                            ?>
+
+                            <div class="linha-item" data-nome="<?= htmlspecialchars(
+                                $item["nome"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            ) ?>" data-tipo="<?= htmlspecialchars(
+                                 $tipoItem,
+                                 ENT_QUOTES,
+                                 "UTF-8"
+                             ) ?>">
+                                <label for="item_<?= $idItem ?>">
+                                    <?= htmlspecialchars(
+                                        $item["nome"],
+                                        ENT_QUOTES,
+                                        "UTF-8"
+                                    ) ?>
+
+                                    (
+                                    <?= htmlspecialchars(
+                                        $nomeTipoItem,
+                                        ENT_QUOTES,
+                                        "UTF-8"
+                                    ) ?>
+                                    ):
+                                </label>
+
+                                <input type="number" id="item_<?= $idItem ?>" name="itens[<?= $idItem ?>]" min="0"
+                                    value="<?= $quantidade ?>">
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+
+                    <p id="mensagem_sem_itens" hidden>
+                        Nenhum item encontrado com esses filtros.
+                    </p>
                 <?php endif; ?>
             </fieldset>
 
@@ -506,6 +570,73 @@ $nomesSlotsVestimenta = [
             formProfissao.addEventListener(
                 "submit",
                 validarVantagens
+            );
+        }
+
+        const pesquisaItem =
+            document.getElementById("pesquisa_item");
+
+        const filtroTipoItem =
+            document.getElementById("filtro_tipo_item");
+
+        const linhasItens =
+            document.querySelectorAll(".linha-item");
+
+        const mensagemSemItens =
+            document.getElementById("mensagem_sem_itens");
+
+        function filtrarItens() {
+            if (!pesquisaItem || !filtroTipoItem) {
+                return;
+            }
+
+            const textoPesquisado =
+                pesquisaItem.value.trim().toLocaleLowerCase();
+
+            const tipoSelecionado =
+                filtroTipoItem.value;
+
+            let quantidadeVisivel = 0;
+
+            linhasItens.forEach(function (linha) {
+                const nomeItem =
+                    linha.dataset.nome.toLocaleLowerCase();
+
+                const tipoItem =
+                    linha.dataset.tipo;
+
+                const correspondeNome =
+                    nomeItem.includes(textoPesquisado);
+
+                const correspondeTipo =
+                    tipoSelecionado === "" ||
+                    tipoItem === tipoSelecionado;
+
+                const deveMostrar =
+                    correspondeNome && correspondeTipo;
+
+                linha.hidden = !deveMostrar;
+
+                if (deveMostrar) {
+                    quantidadeVisivel++;
+                }
+            });
+
+            if (mensagemSemItens) {
+                mensagemSemItens.hidden =
+                    quantidadeVisivel !== 0;
+            }
+        }
+
+        if (pesquisaItem && filtroTipoItem) {
+            pesquisaItem.addEventListener(
+                "input",
+                filtrarItens
+            );
+
+            filtroTipoItem.addEventListener(
+                "change",
+                filtrarItens
             );
         }
     </script>
