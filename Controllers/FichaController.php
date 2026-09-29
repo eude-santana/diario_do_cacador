@@ -42,6 +42,20 @@ switch ($acao) {
         );
         break;
 
+    case 'gerenciar':
+        gerenciarFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
+    case 'atualizar_dados':
+        atualizarDadosFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
     default:
         header(
             'Location: /Controllers/FichaController.php?acao=listar'
@@ -209,22 +223,21 @@ function listarFichas(
     $erro = '';
     $mensagem = '';
 
+    $sucesso = $_GET['sucesso'] ?? '';
     $codigoErro = $_GET['erro'] ?? '';
+
+    if ($sucesso === 'cadastro') {
+        $mensagem = 'Personagem cadastrado com sucesso.';
+    } elseif ($sucesso === 'exclusao') {
+        $mensagem = 'Ficha excluída com sucesso.';
+    }
 
     if ($codigoErro === 'ficha_invalida') {
         $erro = 'A ficha informada é inválida.';
     } elseif ($codigoErro === 'ficha_nao_encontrada') {
-        $erro = 'Ficha não encontrada ou não pertence ao usuário.';
+        $erro = 'Ficha não encontrada ou pertencente a outro usuário.';
     } elseif ($codigoErro === 'banco') {
         $erro = 'Não foi possível excluir a ficha.';
-    }
-
-    $sucesso = $_GET['sucesso'] ?? '';
-
-    if ($sucesso === 'cadastro') {
-        $mensagem = 'Ficha cadastrada com sucesso.';
-    } elseif ($sucesso === 'exclusao') {
-        $mensagem = 'Ficha excluída com sucesso.';
     }
 
     try {
@@ -292,6 +305,212 @@ function excluirFicha(
         );
         exit;
     }
+}
+
+function gerenciarFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    $idFicha = lerIdFicha(
+        $_GET['id'] ?? null
+    );
+
+    if ($idFicha === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    $mensagem = '';
+    $erro = '';
+
+    $sucesso = $_GET['sucesso'] ?? '';
+
+    if ($sucesso === 'dados') {
+        $mensagem = 'Dados do personagem atualizados com sucesso.';
+    }
+
+    try {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $erro,
+            $mensagem
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=banco'
+        );
+        exit;
+    }
+}
+
+function atualizarDadosFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header(
+            'Location: /Controllers/FichaController.php?acao=listar'
+        );
+        exit;
+    }
+
+    $idFicha = lerIdFicha(
+        $_POST['id_ficha'] ?? null
+    );
+
+    if ($idFicha === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    $nomePersonagem = trim(
+        $_POST['nome'] ?? ''
+    );
+
+    $pvAtual = lerInteiroNaoNegativoFicha(
+        $_POST['pv_atual'] ?? null
+    );
+
+    $fadiga = lerInteiroNaoNegativoFicha(
+        $_POST['fadiga'] ?? null
+    );
+
+    if ($pvAtual === null) {
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Informe um valor válido para o PV atual.'
+            );
+        } catch (PDOException $excecao) {
+            error_log($excecao->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+        }
+
+        return;
+    }
+
+    if ($fadiga === null) {
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Informe um valor válido para a fadiga.'
+            );
+        } catch (PDOException $excecao) {
+            error_log($excecao->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+        }
+
+        return;
+    }
+
+    try {
+        $fichaModel->atualizarDadosBasicos(
+            $idFicha,
+            $idUsuario,
+            $nomePersonagem,
+            $pvAtual,
+            $fadiga
+        );
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=gerenciar&id=' . $idFicha
+            . '&sucesso=dados'
+        );
+        exit;
+    } catch (InvalidArgumentException $excecao) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $excecao->getMessage()
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Não foi possível atualizar os dados do personagem.'
+            );
+        } catch (PDOException $novoErro) {
+            error_log($novoErro->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+            exit;
+        }
+    }
+}
+
+function exibirGerenciamentoFicha(
+    Ficha $fichaModel,
+    int $idUsuario,
+    int $idFicha,
+    string $erro = '',
+    string $mensagem = ''
+): void {
+    $detalhes = $fichaModel->buscarDetalhes(
+        $idFicha,
+        $idUsuario
+    );
+
+    if ($detalhes === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_nao_encontrada'
+        );
+        exit;
+    }
+
+    require __DIR__ . '/../Views/Ficha/gerenciar.php';
+}
+
+function lerInteiroNaoNegativoFicha(
+    mixed $valor
+): ?int {
+    $numero = filter_var(
+        $valor,
+        FILTER_VALIDATE_INT,
+        [
+            'options' => [
+                'min_range' => 0
+            ]
+        ]
+    );
+
+    if ($numero === false) {
+        return null;
+    }
+
+    return $numero;
 }
 
 /*

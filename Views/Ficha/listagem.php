@@ -99,10 +99,11 @@ function escaparListagemFicha(mixed $valor): string
                         </td>
 
                         <td>
-                            <!--
-                            O botão Gerenciar será adicionado quando
-                            criarmos a tela de gerenciamento da ficha.
-                            -->
+                            <a href="/Controllers/FichaController.php?acao=gerenciar&id=<?php
+                            echo (int) $ficha['id_ficha'];
+                            ?>">
+                                Gerenciar
+                            </a>
 
                             <form action="/Controllers/FichaController.php" method="POST" onsubmit="
                                     return confirm(
