@@ -56,6 +56,27 @@ switch ($acao) {
         );
         break;
 
+    case 'atualizar_companheiro':
+        atualizarCompanheiroFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
+    case 'atualizar_item':
+        atualizarItemFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
+    case 'atualizar_arma':
+        atualizarArmaFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
     default:
         header(
             'Location: /Controllers/FichaController.php?acao=listar'
@@ -330,6 +351,12 @@ function gerenciarFicha(
 
     if ($sucesso === 'dados') {
         $mensagem = 'Dados do personagem atualizados com sucesso.';
+    } elseif ($sucesso === 'companheiro') {
+        $mensagem = 'Companheiro atualizado com sucesso.';
+    } elseif ($sucesso === 'item') {
+        $mensagem = 'Mochila atualizada com sucesso.';
+    } elseif ($sucesso === 'arma') {
+        $mensagem = 'Slot de arma atualizado com sucesso.';
     }
 
     try {
@@ -348,6 +375,271 @@ function gerenciarFicha(
             . '?acao=listar&erro=banco'
         );
         exit;
+    }
+}
+
+function atualizarCompanheiroFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header(
+            'Location: /Controllers/FichaController.php?acao=listar'
+        );
+        exit;
+    }
+
+    $idFicha = lerIdFicha(
+        $_POST['id_ficha'] ?? null
+    );
+
+    if ($idFicha === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    $nomeCompanheiro = trim(
+        $_POST['nome_companheiro'] ?? ''
+    );
+
+    $pvAtual = lerInteiroNaoNegativoFicha(
+        $_POST['pv_companheiro'] ?? null
+    );
+
+    if ($pvAtual === null) {
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Informe um valor válido para o PV do companheiro.'
+            );
+        } catch (PDOException $excecao) {
+            error_log($excecao->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+        }
+
+        return;
+    }
+
+    try {
+        $fichaModel->atualizarCompanheiro(
+            $idFicha,
+            $idUsuario,
+            $nomeCompanheiro,
+            $pvAtual
+        );
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=gerenciar&id=' . $idFicha
+            . '&sucesso=companheiro'
+        );
+        exit;
+    } catch (InvalidArgumentException $excecao) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $excecao->getMessage()
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Não foi possível atualizar o companheiro.'
+            );
+        } catch (PDOException $novoErro) {
+            error_log($novoErro->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+            exit;
+        }
+    }
+}
+
+function atualizarItemFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header(
+            'Location: /Controllers/FichaController.php?acao=listar'
+        );
+        exit;
+    }
+
+    $idFicha = lerIdFicha(
+        $_POST['id_ficha'] ?? null
+    );
+
+    $idItem = lerIdFicha(
+        $_POST['id_item'] ?? null
+    );
+
+    $quantidade = lerInteiroNaoNegativoFicha(
+        $_POST['quantidade'] ?? null
+    );
+
+    if ($idFicha === null || $idItem === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    if ($quantidade === null) {
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Informe uma quantidade válida para o item.'
+            );
+        } catch (PDOException $excecao) {
+            error_log($excecao->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+        }
+
+        return;
+    }
+
+    try {
+        $fichaModel->atualizarItemDaFicha(
+            $idFicha,
+            $idUsuario,
+            $idItem,
+            $quantidade
+        );
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=gerenciar&id=' . $idFicha
+            . '&sucesso=item'
+        );
+        exit;
+    } catch (InvalidArgumentException $excecao) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $excecao->getMessage()
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Não foi possível atualizar o item.'
+            );
+        } catch (PDOException $novoErro) {
+            error_log($novoErro->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+            exit;
+        }
+    }
+}
+
+function atualizarArmaFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header(
+            'Location: /Controllers/FichaController.php?acao=listar'
+        );
+        exit;
+    }
+
+    $idFicha = lerIdFicha(
+        $_POST['id_ficha'] ?? null
+    );
+
+    $slot = lerIdFicha(
+        $_POST['slot'] ?? null
+    );
+
+    /*
+     * Campo vazio representa um slot sem arma.
+     */
+    $idArma = lerIdFicha(
+        $_POST['id_arma'] ?? null
+    );
+
+    if ($idFicha === null || $slot === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    try {
+        $fichaModel->atualizarArmaDaFicha(
+            $idFicha,
+            $idUsuario,
+            $slot,
+            $idArma
+        );
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=gerenciar&id=' . $idFicha
+            . '&sucesso=arma'
+        );
+        exit;
+    } catch (InvalidArgumentException $excecao) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $excecao->getMessage()
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Não foi possível atualizar o slot de arma.'
+            );
+        } catch (PDOException $novoErro) {
+            error_log($novoErro->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+            exit;
+        }
     }
 }
 
@@ -489,6 +781,44 @@ function exibirGerenciamentoFicha(
         );
         exit;
     }
+
+    $buscaItem = trim(
+        $_GET['busca_item'] ?? ''
+    );
+
+    $tipoItem = trim(
+        $_GET['tipo_item'] ?? ''
+    );
+
+    $tiposPermitidos = [
+        'CONSUMIVEL',
+        'MATERIAL',
+        'UTILITARIO',
+        'OUTRO'
+    ];
+
+    if (
+        $tipoItem !== ''
+        && !in_array(
+            $tipoItem,
+            $tiposPermitidos,
+            true
+        )
+    ) {
+        $tipoItem = '';
+    }
+
+    $itensDisponiveis =
+        $fichaModel->listarItensDisponiveis(
+            $idUsuario,
+            $buscaItem,
+            $tipoItem
+        );
+
+    $armasDisponiveis =
+        $fichaModel->listarArmasDisponiveis(
+            $idUsuario
+        );
 
     require __DIR__ . '/../Views/Ficha/gerenciar.php';
 }

@@ -450,6 +450,350 @@ class Ficha
         ]);
     }
 
+    public function atualizarCompanheiro(
+        int $idFicha,
+        int $idUsuario,
+        string $nomeCompanheiro,
+        int $pvAtual
+    ): bool {
+        $nomeCompanheiro = trim($nomeCompanheiro);
+
+        if ($nomeCompanheiro === '') {
+            throw new InvalidArgumentException(
+                'Informe o nome do companheiro.'
+            );
+        }
+
+        if (strlen($nomeCompanheiro) > 100) {
+            throw new InvalidArgumentException(
+                'O nome do companheiro deve possuir no máximo 100 caracteres.'
+            );
+        }
+
+        if ($pvAtual < 0) {
+            throw new InvalidArgumentException(
+                'O PV atual do companheiro não pode ser negativo.'
+            );
+        }
+
+        $sqlBusca = "
+        SELECT
+            c.pv_maximo
+        FROM ficha_companheiro fc
+        INNER JOIN ficha f
+            ON f.id_ficha = fc.id_ficha
+        INNER JOIN companheiro_animal c
+            ON c.id_companheiro = fc.id_companheiro
+        WHERE fc.id_ficha = :id_ficha
+          AND f.id_usuario = :id_usuario
+    ";
+
+        $stmtBusca = $this->conexao->prepare($sqlBusca);
+        $stmtBusca->execute([
+            ':id_ficha' => $idFicha,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        $companheiro = $stmtBusca->fetch(PDO::FETCH_ASSOC);
+
+        if (!$companheiro) {
+            throw new InvalidArgumentException(
+                'Companheiro não encontrado ou ficha pertencente a outro usuário.'
+            );
+        }
+
+        if ($pvAtual > (int) $companheiro['pv_maximo']) {
+            throw new InvalidArgumentException(
+                'O PV atual do companheiro não pode ultrapassar o PV máximo.'
+            );
+        }
+
+        $sqlAtualizacao = "
+        UPDATE ficha_companheiro
+        SET
+            nome = :nome,
+            pv_atual = :pv_atual
+        WHERE id_ficha = :id_ficha
+    ";
+
+        $stmtAtualizacao = $this->conexao->prepare(
+            $sqlAtualizacao
+        );
+
+        return $stmtAtualizacao->execute([
+            ':nome' => $nomeCompanheiro,
+            ':pv_atual' => $pvAtual,
+            ':id_ficha' => $idFicha
+        ]);
+    }
+
+    public function listarItensDisponiveis(
+        int $idUsuario,
+        string $busca = '',
+        string $tipo = ''
+    ): array {
+        $busca = trim($busca);
+        $tipo = trim($tipo);
+
+        $tiposPermitidos = [
+            'CONSUMIVEL',
+            'MATERIAL',
+            'UTILITARIO',
+            'OUTRO'
+        ];
+
+        $sql = "
+        SELECT
+            id_item,
+            nome,
+            tipo,
+            descricao
+        FROM item
+        WHERE id_autor = :id_usuario
+    ";
+
+        $parametros = [
+            ':id_usuario' => $idUsuario
+        ];
+
+        if ($busca !== '') {
+            $sql .= " AND nome LIKE :busca";
+            $parametros[':busca'] = '%' . $busca . '%';
+        }
+
+        if (in_array($tipo, $tiposPermitidos, true)) {
+            $sql .= " AND tipo = :tipo";
+            $parametros[':tipo'] = $tipo;
+        }
+
+        $sql .= " ORDER BY nome";
+
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute($parametros);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function atualizarItemDaFicha(
+        int $idFicha,
+        int $idUsuario,
+        int $idItem,
+        int $quantidade
+    ): bool {
+        if ($idFicha <= 0 || $idItem <= 0) {
+            throw new InvalidArgumentException(
+                'Ficha ou item inválido.'
+            );
+        }
+
+        if ($quantidade < 0) {
+            throw new InvalidArgumentException(
+                'A quantidade não pode ser negativa.'
+            );
+        }
+
+        $sqlFicha = "
+        SELECT id_ficha
+        FROM ficha
+        WHERE id_ficha = :id_ficha
+          AND id_usuario = :id_usuario
+    ";
+
+        $stmtFicha = $this->conexao->prepare($sqlFicha);
+        $stmtFicha->execute([
+            ':id_ficha' => $idFicha,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if (!$stmtFicha->fetch(PDO::FETCH_ASSOC)) {
+            throw new InvalidArgumentException(
+                'Ficha não encontrada ou pertencente a outro usuário.'
+            );
+        }
+
+        $sqlItem = "
+        SELECT id_item
+        FROM item
+        WHERE id_item = :id_item
+          AND id_autor = :id_usuario
+    ";
+
+        $stmtItem = $this->conexao->prepare($sqlItem);
+        $stmtItem->execute([
+            ':id_item' => $idItem,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if (!$stmtItem->fetch(PDO::FETCH_ASSOC)) {
+            throw new InvalidArgumentException(
+                'Item não encontrado ou pertencente a outro usuário.'
+            );
+        }
+
+        /*
+         * Quantidade zero remove o item da mochila.
+         */
+        if ($quantidade === 0) {
+            $sqlRemocao = "
+            DELETE FROM ficha_item
+            WHERE id_ficha = :id_ficha
+              AND id_item = :id_item
+        ";
+
+            $stmtRemocao = $this->conexao->prepare(
+                $sqlRemocao
+            );
+
+            return $stmtRemocao->execute([
+                ':id_ficha' => $idFicha,
+                ':id_item' => $idItem
+            ]);
+        }
+
+        /*
+         * Se o item ainda não estiver na ficha, cadastra.
+         * Se já estiver, atualiza sua quantidade total.
+         */
+        $sql = "
+        INSERT INTO ficha_item (
+            id_ficha,
+            id_item,
+            quantidade
+        ) VALUES (
+            :id_ficha,
+            :id_item,
+            :quantidade
+        )
+        ON DUPLICATE KEY UPDATE
+            quantidade = VALUES(quantidade)
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        return $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':id_item' => $idItem,
+            ':quantidade' => $quantidade
+        ]);
+    }
+
+    public function listarArmasDisponiveis(
+        int $idUsuario
+    ): array {
+        $sql = "
+        SELECT
+            id_arma,
+            nome,
+            tipo,
+            maos,
+            dano,
+            especial
+        FROM arma
+        WHERE id_autor = :id_usuario
+        ORDER BY nome
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([
+            ':id_usuario' => $idUsuario
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function atualizarArmaDaFicha(
+        int $idFicha,
+        int $idUsuario,
+        int $slot,
+        ?int $idArma
+    ): bool {
+        if ($slot < 1 || $slot > 3) {
+            throw new InvalidArgumentException(
+                'O slot da arma deve estar entre 1 e 3.'
+            );
+        }
+
+        $sqlFicha = "
+        SELECT id_ficha
+        FROM ficha
+        WHERE id_ficha = :id_ficha
+          AND id_usuario = :id_usuario
+    ";
+
+        $stmtFicha = $this->conexao->prepare($sqlFicha);
+        $stmtFicha->execute([
+            ':id_ficha' => $idFicha,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if (!$stmtFicha->fetch(PDO::FETCH_ASSOC)) {
+            throw new InvalidArgumentException(
+                'Ficha não encontrada ou pertencente a outro usuário.'
+            );
+        }
+
+        /*
+         * ID vazio significa que o slot deverá ficar vazio.
+         */
+        if ($idArma === null) {
+            $sqlRemocao = "
+            DELETE FROM ficha_arma
+            WHERE id_ficha = :id_ficha
+              AND slot = :slot
+        ";
+
+            $stmtRemocao = $this->conexao->prepare(
+                $sqlRemocao
+            );
+
+            return $stmtRemocao->execute([
+                ':id_ficha' => $idFicha,
+                ':slot' => $slot
+            ]);
+        }
+
+        $sqlArma = "
+        SELECT id_arma
+        FROM arma
+        WHERE id_arma = :id_arma
+          AND id_autor = :id_usuario
+    ";
+
+        $stmtArma = $this->conexao->prepare($sqlArma);
+        $stmtArma->execute([
+            ':id_arma' => $idArma,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if (!$stmtArma->fetch(PDO::FETCH_ASSOC)) {
+            throw new InvalidArgumentException(
+                'Arma não encontrada ou pertencente a outro usuário.'
+            );
+        }
+
+        $sql = "
+        INSERT INTO ficha_arma (
+            id_ficha,
+            slot,
+            id_arma
+        ) VALUES (
+            :id_ficha,
+            :slot,
+            :id_arma
+        )
+        ON DUPLICATE KEY UPDATE
+            id_arma = VALUES(id_arma)
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        return $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':slot' => $slot,
+            ':id_arma' => $idArma
+        ]);
+    }
+
     public function excluir(
         int $idFicha,
         int $idUsuario

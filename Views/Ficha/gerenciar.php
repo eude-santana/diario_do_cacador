@@ -181,72 +181,155 @@ function escaparGerenciamento(mixed $valor): string
     <hr>
 
     <section>
-        <h2>Armas equipadas</h2>
+        <h2>Armas</h2>
 
-        <?php if (empty($armas)): ?>
-            <p>Nenhuma arma equipada.</p>
-        <?php else: ?>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Slot</th>
-                        <th>Arma</th>
-                        <th>Tipo</th>
-                        <th>Mãos</th>
-                        <th>Dano</th>
-                        <th>Especial</th>
-                    </tr>
-                </thead>
+        <p>
+            O personagem pode carregar até três armas.
+            Uma arma de duas mãos continua ocupando apenas um slot.
+        </p>
 
-                <tbody>
-                    <?php foreach ($armas as $arma): ?>
-                        <tr>
-                            <td>
-                                <?php echo (int) $arma['slot']; ?>
-                            </td>
+        <?php
+        $armasPorSlot = [];
 
-                            <td>
+        foreach ($armas as $armaAtual) {
+            $armasPorSlot[(int) $armaAtual['slot']] =
+                $armaAtual;
+        }
+        ?>
+
+        <?php for ($slot = 1; $slot <= 3; $slot++): ?>
+            <?php
+            $armaAtual = $armasPorSlot[$slot] ?? null;
+            ?>
+
+            <article>
+                <h3>
+                    Slot <?php echo $slot; ?>
+                </h3>
+
+                <form action="/Controllers/FichaController.php" method="POST">
+                    <input type="hidden" name="acao" value="atualizar_arma">
+
+                    <input type="hidden" name="id_ficha" value="<?php
+                    echo (int) $ficha['id_ficha'];
+                    ?>">
+
+                    <input type="hidden" name="slot" value="<?php echo $slot; ?>">
+
+                    <label for="arma_slot_<?php echo $slot; ?>">
+                        Arma:
+                    </label>
+
+                    <select name="id_arma" id="arma_slot_<?php echo $slot; ?>">
+                        <option value="">
+                            Slot vazio
+                        </option>
+
+                        <?php foreach (
+                            $armasDisponiveis
+                            as $armaDisponivel
+                        ): ?>
+                            <option value="<?php
+                            echo (int) $armaDisponivel['id_arma'];
+                            ?>" <?php
+                            if (
+                                $armaAtual !== null
+                                && (int) $armaAtual['id_arma']
+                                === (int) $armaDisponivel['id_arma']
+                            ) {
+                                echo 'selected';
+                            }
+                            ?>>
                                 <?php
                                 echo escaparGerenciamento(
-                                    $arma['nome']
+                                    $armaDisponivel['nome']
                                 );
                                 ?>
-                            </td>
-
-                            <td>
+                                —
                                 <?php
                                 echo escaparGerenciamento(
-                                    $arma['tipo']
+                                    $armaDisponivel['tipo']
                                 );
                                 ?>
-                            </td>
-
-                            <td>
-                                <?php echo (int) $arma['maos']; ?>
-                            </td>
-
-                            <td>
+                                —
                                 <?php
-                                echo escaparGerenciamento(
-                                    $arma['dano']
-                                );
+                                echo (int) $armaDisponivel['maos'];
                                 ?>
-                            </td>
+                                mão(ões)
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
 
-                            <td>
-                                <?php
-                                echo nl2br(
-                                    escaparGerenciamento(
-                                        $arma['especial'] ?? ''
-                                    )
-                                );
-                                ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
-        <?php endif; ?>
+                    <button type="submit">
+                        Salvar slot
+                    </button>
+                </form>
+
+                <?php if ($armaAtual === null): ?>
+                    <p>Este slot está vazio.</p>
+                <?php else: ?>
+                    <p>
+                        <strong>Arma atual:</strong>
+
+                        <?php
+                        echo escaparGerenciamento(
+                            $armaAtual['nome']
+                        );
+                        ?>
+                    </p>
+
+                    <p>
+                        <strong>Tipo:</strong>
+
+                        <?php
+                        echo escaparGerenciamento(
+                            $armaAtual['tipo']
+                        );
+                        ?>
+                    </p>
+
+                    <p>
+                        <strong>Mãos:</strong>
+
+                        <?php
+                        echo (int) $armaAtual['maos'];
+                        ?>
+                    </p>
+
+                    <p>
+                        <strong>Dano:</strong>
+
+                        <?php
+                        echo escaparGerenciamento(
+                            $armaAtual['dano']
+                        );
+                        ?>
+                    </p>
+
+                    <?php if (
+                        !empty($armaAtual['especial'])
+                    ): ?>
+                        <p>
+                            <strong>Especial:</strong>
+
+                            <?php
+                            echo nl2br(
+                                escaparGerenciamento(
+                                    $armaAtual['especial']
+                                )
+                            );
+                            ?>
+                        </p>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </article>
+        <?php endfor; ?>
+
+        <p>
+            <a href="/Controllers/ArmaController.php?acao=novo">
+                Cadastrar nova arma
+            </a>
+        </p>
     </section>
 
     <hr>
@@ -341,7 +424,7 @@ function escaparGerenciamento(mixed $valor): string
     <hr>
 
     <section>
-        <h2>Itens</h2>
+        <h2>Mochila</h2>
 
         <?php if (empty($itens)): ?>
             <p>Nenhum item na mochila.</p>
@@ -353,6 +436,7 @@ function escaparGerenciamento(mixed $valor): string
                         <th>Tipo</th>
                         <th>Quantidade</th>
                         <th>Descrição</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
 
@@ -376,9 +460,25 @@ function escaparGerenciamento(mixed $valor): string
                             </td>
 
                             <td>
-                                <?php
-                                echo (int) $item['quantidade'];
-                                ?>
+                                <form action="/Controllers/FichaController.php" method="POST">
+                                    <input type="hidden" name="acao" value="atualizar_item">
+
+                                    <input type="hidden" name="id_ficha" value="<?php
+                                    echo (int) $ficha['id_ficha'];
+                                    ?>">
+
+                                    <input type="hidden" name="id_item" value="<?php
+                                    echo (int) $item['id_item'];
+                                    ?>">
+
+                                    <input type="number" name="quantidade" min="0" required value="<?php
+                                    echo (int) $item['quantidade'];
+                                    ?>">
+
+                                    <button type="submit">
+                                        Atualizar
+                                    </button>
+                                </form>
                             </td>
 
                             <td>
@@ -390,11 +490,178 @@ function escaparGerenciamento(mixed $valor): string
                                 );
                                 ?>
                             </td>
+
+                            <td>
+                                <form action="/Controllers/FichaController.php" method="POST" onsubmit="
+                                    return confirm(
+                                        'Deseja remover este item da mochila?'
+                                    );
+                                ">
+                                    <input type="hidden" name="acao" value="atualizar_item">
+
+                                    <input type="hidden" name="id_ficha" value="<?php
+                                    echo (int) $ficha['id_ficha'];
+                                    ?>">
+
+                                    <input type="hidden" name="id_item" value="<?php
+                                    echo (int) $item['id_item'];
+                                    ?>">
+
+                                    <input type="hidden" name="quantidade" value="0">
+
+                                    <button type="submit">
+                                        Remover
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>
             </table>
         <?php endif; ?>
+
+        <h3>Localizar item</h3>
+
+        <form action="/Controllers/FichaController.php" method="GET">
+            <input type="hidden" name="acao" value="gerenciar">
+
+            <input type="hidden" name="id" value="<?php
+            echo (int) $ficha['id_ficha'];
+            ?>">
+
+            <p>
+                <label for="busca_item">
+                    Nome:
+                </label>
+
+                <input type="search" name="busca_item" id="busca_item" value="<?php
+                echo escaparGerenciamento(
+                    $buscaItem ?? ''
+                );
+                ?>">
+            </p>
+
+            <p>
+                <label for="tipo_item">
+                    Tipo:
+                </label>
+
+                <select name="tipo_item" id="tipo_item">
+                    <option value="">
+                        Todos
+                    </option>
+
+                    <option value="CONSUMIVEL" <?php
+                    if (($tipoItem ?? '') === 'CONSUMIVEL') {
+                        echo 'selected';
+                    }
+                    ?>>
+                        Consumível
+                    </option>
+
+                    <option value="MATERIAL" <?php
+                    if (($tipoItem ?? '') === 'MATERIAL') {
+                        echo 'selected';
+                    }
+                    ?>>
+                        Material
+                    </option>
+
+                    <option value="UTILITARIO" <?php
+                    if (($tipoItem ?? '') === 'UTILITARIO') {
+                        echo 'selected';
+                    }
+                    ?>>
+                        Utilitário
+                    </option>
+
+                    <option value="OUTRO" <?php
+                    if (($tipoItem ?? '') === 'OUTRO') {
+                        echo 'selected';
+                    }
+                    ?>>
+                        Outro
+                    </option>
+                </select>
+            </p>
+
+            <button type="submit">
+                Buscar
+            </button>
+
+            <a href="/Controllers/FichaController.php?acao=gerenciar&id=<?php
+            echo (int) $ficha['id_ficha'];
+            ?>">
+                Limpar filtros
+            </a>
+        </form>
+
+        <h3>Adicionar item</h3>
+
+        <?php if (empty($itensDisponiveis)): ?>
+            <p>
+                Nenhum item encontrado com os filtros informados.
+            </p>
+        <?php else: ?>
+            <form action="/Controllers/FichaController.php" method="POST">
+                <input type="hidden" name="acao" value="atualizar_item">
+
+                <input type="hidden" name="id_ficha" value="<?php
+                echo (int) $ficha['id_ficha'];
+                ?>">
+
+                <p>
+                    <label for="id_item">
+                        Item:
+                    </label>
+
+                    <select name="id_item" id="id_item" required>
+                        <option value="">
+                            Selecione um item
+                        </option>
+
+                        <?php foreach (
+                            $itensDisponiveis
+                            as $itemDisponivel
+                        ): ?>
+                            <option value="<?php
+                            echo (int) $itemDisponivel['id_item'];
+                            ?>">
+                                <?php
+                                echo escaparGerenciamento(
+                                    $itemDisponivel['nome']
+                                );
+                                ?>
+                                —
+                                <?php
+                                echo escaparGerenciamento(
+                                    $itemDisponivel['tipo']
+                                );
+                                ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </p>
+
+                <p>
+                    <label for="quantidade_novo_item">
+                        Quantidade total:
+                    </label>
+
+                    <input type="number" name="quantidade" id="quantidade_novo_item" min="1" value="1" required>
+                </p>
+
+                <button type="submit">
+                    Adicionar à mochila
+                </button>
+            </form>
+        <?php endif; ?>
+
+        <p>
+            <a href="/Controllers/ItemController.php?acao=novo">
+                Cadastrar novo item
+            </a>
+        </p>
     </section>
 
     <hr>
@@ -445,65 +712,87 @@ function escaparGerenciamento(mixed $valor): string
         <h2>Companheiro animal</h2>
 
         <?php if ($companheiro === null): ?>
-            <p>Este personagem não possui companheiro.</p>
+            <p>
+                Este personagem não possui companheiro.
+            </p>
         <?php else: ?>
-            <p>
-                <strong>Nome:</strong>
+            <form action="/Controllers/FichaController.php" method="POST">
+                <input type="hidden" name="acao" value="atualizar_companheiro">
 
-                <?php
-                echo escaparGerenciamento(
-                    $companheiro['nome']
-                );
-                ?>
-            </p>
+                <input type="hidden" name="id_ficha" value="<?php
+                echo (int) $ficha['id_ficha'];
+                ?>">
 
-            <p>
-                <strong>Tipo:</strong>
-
-                <?php
-                echo escaparGerenciamento(
-                    $companheiro['tipo']
-                );
-                ?>
-            </p>
-
-            <p>
-                <strong>PV:</strong>
-
-                <?php
-                echo (int) $companheiro['pv_atual'];
-                ?>
-                /
-                <?php
-                echo (int) $companheiro['pv_maximo'];
-                ?>
-            </p>
-
-            <?php if (!empty($companheiro['dano'])): ?>
                 <p>
-                    <strong>Dano:</strong>
+                    <label for="nome_companheiro">
+                        Nome do companheiro:
+                    </label>
+
+                    <input type="text" name="nome_companheiro" id="nome_companheiro" maxlength="100" required value="<?php
+                    echo escaparGerenciamento(
+                        $companheiro['nome']
+                    );
+                    ?>">
+                </p>
+
+                <p>
+                    <strong>Tipo:</strong>
 
                     <?php
                     echo escaparGerenciamento(
-                        $companheiro['dano']
+                        $companheiro['tipo']
                     );
                     ?>
                 </p>
-            <?php endif; ?>
 
-            <?php if (
-                !empty($companheiro['descricao'])
-            ): ?>
                 <p>
-                    <?php
-                    echo nl2br(
-                        escaparGerenciamento(
-                            $companheiro['descricao']
-                        )
-                    );
-                    ?>
+                    <label for="pv_companheiro">
+                        PV atual:
+                    </label>
+
+                    <input type="number" name="pv_companheiro" id="pv_companheiro" min="0" max="<?php
+                    echo (int) $companheiro['pv_maximo'];
+                    ?>" required value="<?php
+                    echo (int) $companheiro['pv_atual'];
+                    ?>">
+
+                    <span>
+                        / <?php
+                        echo (int) $companheiro['pv_maximo'];
+                        ?>
+                    </span>
                 </p>
-            <?php endif; ?>
+
+                <?php if (!empty($companheiro['dano'])): ?>
+                    <p>
+                        <strong>Dano:</strong>
+
+                        <?php
+                        echo escaparGerenciamento(
+                            $companheiro['dano']
+                        );
+                        ?>
+                    </p>
+                <?php endif; ?>
+
+                <?php if (
+                    !empty($companheiro['descricao'])
+                ): ?>
+                    <p>
+                        <?php
+                        echo nl2br(
+                            escaparGerenciamento(
+                                $companheiro['descricao']
+                            )
+                        );
+                        ?>
+                    </p>
+                <?php endif; ?>
+
+                <button type="submit">
+                    Salvar companheiro
+                </button>
+            </form>
         <?php endif; ?>
     </section>
 
