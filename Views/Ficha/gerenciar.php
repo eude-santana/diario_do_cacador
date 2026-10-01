@@ -11,6 +11,15 @@ $vestimentas = $detalhes['vestimentas'] ?? [];
 $itens = $detalhes['itens'] ?? [];
 $magias = $detalhes['magias'] ?? [];
 $companheiro = $detalhes['companheiro'] ?? null;
+$armasDisponiveis = $armasDisponiveis ?? [];
+$vestimentasDisponiveis = $vestimentasDisponiveis ?? [];
+$itensDisponiveis = $itensDisponiveis ?? [];
+$magiasDisponiveis = $magiasDisponiveis ?? [];
+
+$podeUsarMagias = $podeUsarMagias ?? false;
+
+$buscaItem = $buscaItem ?? '';
+$tipoItem = $tipoItem ?? '';
 
 function escaparGerenciamento(mixed $valor): string
 {
@@ -816,8 +825,8 @@ function escaparGerenciamento(mixed $valor): string
 
     <hr>
 
-    <fieldset>
-        <legend>Magias aprendidas</legend>
+    <section>
+        <h2>Magias aprendidas</h2>
 
         <?php if (!$podeUsarMagias): ?>
             <p>
@@ -825,11 +834,11 @@ function escaparGerenciamento(mixed $valor): string
             </p>
         <?php else: ?>
 
-            <?php if (empty($detalhes['magias'])): ?>
+            <?php if (empty($magias)): ?>
                 <p>O personagem ainda não conhece nenhuma magia.</p>
             <?php else: ?>
                 <ul>
-                    <?php foreach ($detalhes['magias'] as $magia): ?>
+                    <?php foreach ($magias as $magia): ?>
                         <li>
                             <strong>
                                 <?= htmlspecialchars(
@@ -862,7 +871,7 @@ function escaparGerenciamento(mixed $valor): string
                             );">
                                 <input type="hidden" name="acao" value="remover_magia">
 
-                                <input type="hidden" name="id_ficha" value="<?= (int) $detalhes['ficha']['id_ficha'] ?>">
+                                <input type="hidden" name="id_ficha" value="<?php echo (int) $ficha['id_ficha']; ?>">
 
                                 <input type="hidden" name="id_magia" value="<?= (int) $magia['id_magia'] ?>">
 
@@ -885,7 +894,7 @@ function escaparGerenciamento(mixed $valor): string
                 <form method="post" action="/Controllers/FichaController.php">
                     <input type="hidden" name="acao" value="adicionar_magia">
 
-                    <input type="hidden" name="id_ficha" value="<?= (int) $detalhes['ficha']['id_ficha'] ?>">
+                    <input type="hidden" name="id_ficha" value="<?php echo (int) $ficha['id_ficha']; ?>">
 
                     <label for="id_magia">
                         Magia:
@@ -922,111 +931,112 @@ function escaparGerenciamento(mixed $valor): string
             </p>
 
         <?php endif; ?>
-    </fieldset>
+        </fieldset>
 
-    <hr>
+        <hr>
 
-    <section>
-        <h2>Companheiro animal</h2>
+        <section>
+            <h2>Companheiro animal</h2>
 
-        <?php if ($companheiro === null): ?>
-            <p>
-                Este personagem não possui companheiro.
-            </p>
-        <?php else: ?>
-            <form action="/Controllers/FichaController.php" method="POST">
-                <input type="hidden" name="acao" value="atualizar_companheiro">
-
-                <input type="hidden" name="id_ficha" value="<?php
-                echo (int) $ficha['id_ficha'];
-                ?>">
-
+            <?php if ($companheiro === null): ?>
                 <p>
-                    <label for="nome_companheiro">
-                        Nome do companheiro:
-                    </label>
-
-                    <input type="text" name="nome_companheiro" id="nome_companheiro" maxlength="100" required value="<?php
-                    echo escaparGerenciamento(
-                        $companheiro['nome']
-                    );
-                    ?>">
+                    Este personagem não possui companheiro.
                 </p>
+            <?php else: ?>
+                <form action="/Controllers/FichaController.php" method="POST">
+                    <input type="hidden" name="acao" value="atualizar_companheiro">
 
-                <p>
-                    <strong>Tipo:</strong>
-
-                    <?php
-                    echo escaparGerenciamento(
-                        $companheiro['tipo']
-                    );
-                    ?>
-                </p>
-
-                <p>
-                    <label for="pv_companheiro">
-                        PV atual:
-                    </label>
-
-                    <input type="number" name="pv_companheiro" id="pv_companheiro" min="0" max="<?php
-                    echo (int) $companheiro['pv_maximo'];
-                    ?>" required value="<?php
-                    echo (int) $companheiro['pv_atual'];
+                    <input type="hidden" name="id_ficha" value="<?php
+                    echo (int) $ficha['id_ficha'];
                     ?>">
 
-                    <span>
-                        / <?php
-                        echo (int) $companheiro['pv_maximo'];
-                        ?>
-                    </span>
-                </p>
-
-                <?php if (!empty($companheiro['dano'])): ?>
                     <p>
-                        <strong>Dano:</strong>
+                        <label for="nome_companheiro">
+                            Nome do companheiro:
+                        </label>
+
+                        <input type="text" name="nome_companheiro" id="nome_companheiro" maxlength="100" required value="<?php
+                        echo escaparGerenciamento(
+                            $companheiro['nome']
+                        );
+                        ?>">
+                    </p>
+
+                    <p>
+                        <strong>Tipo:</strong>
 
                         <?php
                         echo escaparGerenciamento(
-                            $companheiro['dano']
+                            $companheiro['tipo']
                         );
                         ?>
                     </p>
-                <?php endif; ?>
 
-                <?php if (
-                    !empty($companheiro['descricao'])
-                ): ?>
                     <p>
-                        <?php
-                        echo nl2br(
-                            escaparGerenciamento(
-                                $companheiro['descricao']
-                            )
-                        );
-                        ?>
+                        <label for="pv_companheiro">
+                            PV atual:
+                        </label>
+
+                        <input type="number" name="pv_companheiro" id="pv_companheiro" min="0" max="<?php
+                        echo (int) $companheiro['pv_maximo'];
+                        ?>" required value="<?php
+                        echo (int) $companheiro['pv_atual'];
+                        ?>">
+
+                        <span>
+                            / <?php
+                            echo (int) $companheiro['pv_maximo'];
+                            ?>
+                        </span>
                     </p>
-                <?php endif; ?>
 
-                <button type="submit">
-                    Salvar companheiro
-                </button>
-            </form>
-        <?php endif; ?>
+                    <?php if (!empty($companheiro['dano'])): ?>
+                        <p>
+                            <strong>Dano:</strong>
+
+                            <?php
+                            echo escaparGerenciamento(
+                                $companheiro['dano']
+                            );
+                            ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <?php if (
+                        !empty($companheiro['descricao'])
+                    ): ?>
+                        <p>
+                            <?php
+                            echo nl2br(
+                                escaparGerenciamento(
+                                    $companheiro['descricao']
+                                )
+                            );
+                            ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <button type="submit">
+                        Salvar companheiro
+                    </button>
+                </form>
+            <?php endif; ?>
+        </section>
+
+        <hr>
+
+        <p>
+            <a href="/Controllers/FichaController.php?acao=listar">
+                Voltar para meus personagens
+            </a>
+        </p>
+
+        <p>
+            <a href="/Views/Usuario/painel.php">
+                Voltar ao painel
+            </a>
+        </p>
     </section>
-
-    <hr>
-
-    <p>
-        <a href="/Controllers/FichaController.php?acao=listar">
-            Voltar para meus personagens
-        </a>
-    </p>
-
-    <p>
-        <a href="/Views/Usuario/painel.php">
-            Voltar ao painel
-        </a>
-    </p>
 </body>
 
 </html>
