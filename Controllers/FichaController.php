@@ -77,6 +77,124 @@ switch ($acao) {
         );
         break;
 
+    case 'equipar_vestimenta':
+        equiparVestimentaFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
+    case 'atualizar_protecao':
+        atualizarProtecaoFicha(
+            $fichaModel,
+            $idUsuario
+        );
+        break;
+
+    case 'adicionar_magia':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header(
+                'Location: /Controllers/FichaController.php?acao=listar'
+            );
+            exit;
+        }
+
+        $idFicha = filter_var(
+            $_POST['id_ficha'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        $idMagia = filter_var(
+            $_POST['id_magia'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        if ($idFicha === false || $idMagia === false) {
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=dados_invalidos'
+            );
+            exit;
+        }
+
+        try {
+            $fichaModel->adicionarMagiaNaFicha(
+                $idFicha,
+                $idMagia,
+                $idUsuario
+            );
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=gerenciar'
+                . '&id=' . $idFicha
+                . '&sucesso=magia_adicionada'
+            );
+            exit;
+        } catch (Throwable $erro) {
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=gerenciar'
+                . '&id=' . $idFicha
+                . '&erro=' . urlencode($erro->getMessage())
+            );
+            exit;
+        }
+
+    case 'remover_magia':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header(
+                'Location: /Controllers/FichaController.php?acao=listar'
+            );
+            exit;
+        }
+
+        $idFicha = filter_var(
+            $_POST['id_ficha'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        $idMagia = filter_var(
+            $_POST['id_magia'] ?? null,
+            FILTER_VALIDATE_INT,
+            ['options' => ['min_range' => 1]]
+        );
+
+        if ($idFicha === false || $idMagia === false) {
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=dados_invalidos'
+            );
+            exit;
+        }
+
+        try {
+            $fichaModel->removerMagiaDaFicha(
+                $idFicha,
+                $idMagia,
+                $idUsuario
+            );
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=gerenciar'
+                . '&id=' . $idFicha
+                . '&sucesso=magia_removida'
+            );
+            exit;
+        } catch (Throwable $erro) {
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=gerenciar'
+                . '&id=' . $idFicha
+                . '&erro=' . urlencode($erro->getMessage())
+            );
+            exit;
+        }
+
     default:
         header(
             'Location: /Controllers/FichaController.php?acao=listar'
@@ -357,7 +475,13 @@ function gerenciarFicha(
         $mensagem = 'Mochila atualizada com sucesso.';
     } elseif ($sucesso === 'arma') {
         $mensagem = 'Slot de arma atualizado com sucesso.';
+    } elseif ($sucesso === 'vestimenta') {
+        $mensagem = 'Vestimenta equipada com sucesso.';
+    } elseif ($sucesso === 'protecao') {
+        $mensagem = 'Pontos de proteção atualizados com sucesso.';
     }
+
+
 
     try {
         exibirGerenciamentoFicha(
@@ -588,9 +712,20 @@ function atualizarArmaFicha(
     /*
      * Campo vazio representa um slot sem arma.
      */
-    $idArma = lerIdFicha(
+    $idArma = lerIdOpcionalFicha(
         $_POST['id_arma'] ?? null
     );
+
+    if ($idArma === false) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            'Selecione uma arma válida.'
+        );
+
+        return;
+    }
 
     if ($idFicha === null || $slot === null) {
         header(
@@ -640,6 +775,174 @@ function atualizarArmaFicha(
             );
             exit;
         }
+    }
+}
+
+function equiparVestimentaFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header(
+            'Location: /Controllers/FichaController.php?acao=listar'
+        );
+        exit;
+    }
+
+    $idFicha = lerIdFicha(
+        $_POST['id_ficha'] ?? null
+    );
+
+    $tipoSlot = trim(
+        $_POST['tipo_slot'] ?? ''
+    );
+
+    $idVestimenta = lerIdOpcionalFicha(
+        $_POST['id_vestimenta'] ?? null
+    );
+
+    if ($idFicha === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    if ($idVestimenta === false) {
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Selecione uma vestimenta válida.'
+            );
+        } catch (PDOException $excecao) {
+            error_log($excecao->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+        }
+
+        return;
+    }
+
+    try {
+        $fichaModel->equiparVestimentaNaFicha(
+            $idFicha,
+            $idUsuario,
+            $tipoSlot,
+            $idVestimenta
+        );
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=gerenciar&id=' . $idFicha
+            . '&sucesso=vestimenta'
+        );
+        exit;
+    } catch (InvalidArgumentException $excecao) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $excecao->getMessage()
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            'Não foi possível atualizar a vestimenta.'
+        );
+    }
+}
+
+function atualizarProtecaoFicha(
+    Ficha $fichaModel,
+    int $idUsuario
+): void {
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+        header(
+            'Location: /Controllers/FichaController.php?acao=listar'
+        );
+        exit;
+    }
+
+    $idFicha = lerIdFicha(
+        $_POST['id_ficha'] ?? null
+    );
+
+    $tipoSlot = trim(
+        $_POST['tipo_slot'] ?? ''
+    );
+
+    $pontosProtecao = lerInteiroNaoNegativoFicha(
+        $_POST['pontos_protecao_atual'] ?? null
+    );
+
+    if ($idFicha === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
+
+    if ($pontosProtecao === null) {
+        try {
+            exibirGerenciamentoFicha(
+                $fichaModel,
+                $idUsuario,
+                $idFicha,
+                'Informe um valor válido para o PP atual.'
+            );
+        } catch (PDOException $excecao) {
+            error_log($excecao->getMessage());
+
+            header(
+                'Location: /Controllers/FichaController.php'
+                . '?acao=listar&erro=banco'
+            );
+        }
+
+        return;
+    }
+
+    try {
+        $fichaModel->atualizarProtecaoVestimenta(
+            $idFicha,
+            $idUsuario,
+            $tipoSlot,
+            $pontosProtecao
+        );
+
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=gerenciar&id=' . $idFicha
+            . '&sucesso=protecao'
+        );
+        exit;
+    } catch (InvalidArgumentException $excecao) {
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            $excecao->getMessage()
+        );
+    } catch (PDOException $excecao) {
+        error_log($excecao->getMessage());
+
+        exibirGerenciamentoFicha(
+            $fichaModel,
+            $idUsuario,
+            $idFicha,
+            'Não foi possível atualizar os pontos de proteção.'
+        );
     }
 }
 
@@ -820,6 +1123,25 @@ function exibirGerenciamentoFicha(
             $idUsuario
         );
 
+    $vestimentasDisponiveis =
+        $fichaModel->listarVestimentasDisponiveis(
+            $idUsuario
+        );
+
+    $podeUsarMagias = $fichaModel->fichaPodeUsarMagias(
+        $idFicha,
+        $idUsuario
+    );
+
+    $magiasDisponiveis = [];
+
+    if ($podeUsarMagias) {
+        $magiasDisponiveis = $fichaModel->listarMagiasDisponiveis(
+            $idFicha,
+            $idUsuario
+        );
+    }
+
     require __DIR__ . '/../Views/Ficha/gerenciar.php';
 }
 
@@ -867,6 +1189,30 @@ function lerIdFicha(mixed $valor): ?int
 
     if ($id === false) {
         return null;
+    }
+
+    return $id;
+}
+
+function lerIdOpcionalFicha(
+    mixed $valor
+): mixed {
+    if ($valor === null || $valor === '') {
+        return null;
+    }
+
+    $id = filter_var(
+        $valor,
+        FILTER_VALIDATE_INT,
+        [
+            'options' => [
+                'min_range' => 1
+            ]
+        ]
+    );
+
+    if ($id === false) {
+        return false;
     }
 
     return $id;

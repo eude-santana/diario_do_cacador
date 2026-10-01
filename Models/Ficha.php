@@ -794,6 +794,452 @@ class Ficha
         ]);
     }
 
+    public function listarVestimentasDisponiveis(
+        int $idUsuario
+    ): array {
+        $sql = "
+        SELECT
+            id_vestimenta,
+            nome,
+            tipo,
+            pontos_protecao_maximo,
+            dano,
+            elemento,
+            especial
+        FROM vestimenta
+        WHERE id_autor = :id_usuario
+        ORDER BY tipo, nome
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+        $stmt->execute([
+            ':id_usuario' => $idUsuario
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function equiparVestimentaNaFicha(
+        int $idFicha,
+        int $idUsuario,
+        string $tipoSlot,
+        ?int $idVestimenta
+    ): bool {
+        $tiposPermitidos = [
+            'ARMADURA',
+            'ELMO',
+            'BRACELETES',
+            'BOTAS',
+            'ESCUDO'
+        ];
+
+        if (!in_array($tipoSlot, $tiposPermitidos, true)) {
+            throw new InvalidArgumentException(
+                'O espaço da vestimenta é inválido.'
+            );
+        }
+
+        $sqlFicha = "
+        SELECT id_ficha
+        FROM ficha
+        WHERE id_ficha = :id_ficha
+          AND id_usuario = :id_usuario
+    ";
+
+        $stmtFicha = $this->conexao->prepare($sqlFicha);
+        $stmtFicha->execute([
+            ':id_ficha' => $idFicha,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if (!$stmtFicha->fetch(PDO::FETCH_ASSOC)) {
+            throw new InvalidArgumentException(
+                'Ficha não encontrada ou pertencente a outro usuário.'
+            );
+        }
+
+        /*
+         * Vestimenta vazia remove o conteúdo do espaço.
+         */
+        if ($idVestimenta === null) {
+            $sqlRemocao = "
+            DELETE FROM ficha_vestimenta
+            WHERE id_ficha = :id_ficha
+              AND tipo_slot = :tipo_slot
+        ";
+
+            $stmtRemocao = $this->conexao->prepare(
+                $sqlRemocao
+            );
+
+            return $stmtRemocao->execute([
+                ':id_ficha' => $idFicha,
+                ':tipo_slot' => $tipoSlot
+            ]);
+        }
+
+        /*
+         * A vestimenta deve pertencer ao usuário e seu tipo
+         * deve corresponder ao espaço escolhido.
+         */
+        $sqlVestimenta = "
+        SELECT
+            id_vestimenta,
+            pontos_protecao_maximo
+        FROM vestimenta
+        WHERE id_vestimenta = :id_vestimenta
+          AND id_autor = :id_usuario
+          AND tipo = :tipo
+    ";
+
+        $stmtVestimenta = $this->conexao->prepare(
+            $sqlVestimenta
+        );
+
+        $stmtVestimenta->execute([
+            ':id_vestimenta' => $idVestimenta,
+            ':id_usuario' => $idUsuario,
+            ':tipo' => $tipoSlot
+        ]);
+
+        $vestimenta = $stmtVestimenta->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+        if (!$vestimenta) {
+            throw new InvalidArgumentException(
+                'A vestimenta não pertence ao usuário ou não corresponde ao espaço escolhido.'
+            );
+        }
+
+        /*
+         * Verifica se a mesma vestimenta já está equipada.
+         * Isso impede recuperar o PP apenas salvando novamente.
+         */
+        $sqlAtual = "
+        SELECT id_vestimenta
+        FROM ficha_vestimenta
+        WHERE id_ficha = :id_ficha
+          AND tipo_slot = :tipo_slot
+    ";
+
+        $stmtAtual = $this->conexao->prepare($sqlAtual);
+        $stmtAtual->execute([
+            ':id_ficha' => $idFicha,
+            ':tipo_slot' => $tipoSlot
+        ]);
+
+        $vestimentaAtual = $stmtAtual->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+        if (
+            $vestimentaAtual
+            && (int) $vestimentaAtual['id_vestimenta']
+            === $idVestimenta
+        ) {
+            return true;
+        }
+
+        /*
+         * Uma vestimenta diferente começa com seu PP máximo.
+         */
+        $sql = "
+        INSERT INTO ficha_vestimenta (
+            id_ficha,
+            tipo_slot,
+            id_vestimenta,
+            pontos_protecao_atual
+        ) VALUES (
+            :id_ficha,
+            :tipo_slot,
+            :id_vestimenta,
+            :pontos_protecao_atual
+        )
+        ON DUPLICATE KEY UPDATE
+            id_vestimenta = VALUES(id_vestimenta),
+            pontos_protecao_atual =
+                VALUES(pontos_protecao_atual)
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        return $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':tipo_slot' => $tipoSlot,
+            ':id_vestimenta' => $idVestimenta,
+            ':pontos_protecao_atual' =>
+                $vestimenta['pontos_protecao_maximo']
+        ]);
+    }
+
+    public function atualizarProtecaoVestimenta(
+        int $idFicha,
+        int $idUsuario,
+        string $tipoSlot,
+        int $pontosProtecaoAtual
+    ): bool {
+        $tiposPermitidos = [
+            'ARMADURA',
+            'ELMO',
+            'BRACELETES',
+            'BOTAS',
+            'ESCUDO'
+        ];
+
+        if (!in_array($tipoSlot, $tiposPermitidos, true)) {
+            throw new InvalidArgumentException(
+                'O espaço da vestimenta é inválido.'
+            );
+        }
+
+        if ($pontosProtecaoAtual < 0) {
+            throw new InvalidArgumentException(
+                'Os pontos de proteção não podem ser negativos.'
+            );
+        }
+
+        $sqlBusca = "
+        SELECT
+            v.pontos_protecao_maximo
+        FROM ficha_vestimenta fv
+        INNER JOIN ficha f
+            ON f.id_ficha = fv.id_ficha
+        INNER JOIN vestimenta v
+            ON v.id_vestimenta = fv.id_vestimenta
+        WHERE fv.id_ficha = :id_ficha
+          AND fv.tipo_slot = :tipo_slot
+          AND f.id_usuario = :id_usuario
+    ";
+
+        $stmtBusca = $this->conexao->prepare($sqlBusca);
+        $stmtBusca->execute([
+            ':id_ficha' => $idFicha,
+            ':tipo_slot' => $tipoSlot,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        $vestimenta = $stmtBusca->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+        if (!$vestimenta) {
+            throw new InvalidArgumentException(
+                'Nenhuma vestimenta foi encontrada nesse espaço.'
+            );
+        }
+
+        if (
+            $pontosProtecaoAtual
+            > (int) $vestimenta['pontos_protecao_maximo']
+        ) {
+            throw new InvalidArgumentException(
+                'O PP atual não pode ultrapassar o PP máximo.'
+            );
+        }
+
+        /*
+         * PP zero significa que a vestimenta foi destruída.
+         */
+        if ($pontosProtecaoAtual === 0) {
+            $sqlRemocao = "
+            DELETE FROM ficha_vestimenta
+            WHERE id_ficha = :id_ficha
+              AND tipo_slot = :tipo_slot
+        ";
+
+            $stmtRemocao = $this->conexao->prepare(
+                $sqlRemocao
+            );
+
+            return $stmtRemocao->execute([
+                ':id_ficha' => $idFicha,
+                ':tipo_slot' => $tipoSlot
+            ]);
+        }
+
+        $sqlAtualizacao = "
+        UPDATE ficha_vestimenta
+        SET pontos_protecao_atual = :pontos
+        WHERE id_ficha = :id_ficha
+          AND tipo_slot = :tipo_slot
+    ";
+
+        $stmtAtualizacao = $this->conexao->prepare(
+            $sqlAtualizacao
+        );
+
+        return $stmtAtualizacao->execute([
+            ':pontos' => $pontosProtecaoAtual,
+            ':id_ficha' => $idFicha,
+            ':tipo_slot' => $tipoSlot
+        ]);
+    }
+
+    public function fichaPodeUsarMagias(
+        int $idFicha,
+        int $idUsuario
+    ): bool {
+        $sql = "
+        SELECT 1
+        FROM ficha f
+        INNER JOIN profissao_vantagem pv
+            ON pv.id_profissao = f.id_profissao
+        INNER JOIN vantagem_magia vm
+            ON vm.id_vantagem = pv.id_vantagem
+        WHERE f.id_ficha = :id_ficha
+          AND f.id_usuario = :id_usuario
+        LIMIT 1
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        return $stmt->fetchColumn() !== false;
+    }
+
+    public function listarMagiasDisponiveis(
+        int $idFicha,
+        int $idUsuario
+    ): array {
+        $sql = "
+        SELECT
+            m.id_magia,
+            m.nome,
+            m.elemento,
+            m.descricao
+        FROM magia m
+        WHERE m.id_autor = :id_usuario
+          AND NOT EXISTS (
+              SELECT 1
+              FROM ficha_magia fm
+              WHERE fm.id_ficha = :id_ficha
+                AND fm.id_magia = m.id_magia
+          )
+        ORDER BY m.nome
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function adicionarMagiaNaFicha(
+        int $idFicha,
+        int $idMagia,
+        int $idUsuario
+    ): void {
+        if (!$this->fichaPodeUsarMagias($idFicha, $idUsuario)) {
+            throw new RuntimeException(
+                'Esta ficha não possui acesso a magias.'
+            );
+        }
+
+        $sqlMagia = "
+        SELECT id_magia
+        FROM magia
+        WHERE id_magia = :id_magia
+          AND id_autor = :id_usuario
+        LIMIT 1
+    ";
+
+        $stmtMagia = $this->conexao->prepare($sqlMagia);
+
+        $stmtMagia->execute([
+            ':id_magia' => $idMagia,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if (!$stmtMagia->fetchColumn()) {
+            throw new RuntimeException(
+                'A magia selecionada não foi encontrada.'
+            );
+        }
+
+        $sqlExistente = "
+        SELECT 1
+        FROM ficha_magia
+        WHERE id_ficha = :id_ficha
+          AND id_magia = :id_magia
+        LIMIT 1
+    ";
+
+        $stmtExistente = $this->conexao->prepare($sqlExistente);
+
+        $stmtExistente->execute([
+            ':id_ficha' => $idFicha,
+            ':id_magia' => $idMagia
+        ]);
+
+        if ($stmtExistente->fetchColumn()) {
+            throw new RuntimeException(
+                'O personagem já conhece essa magia.'
+            );
+        }
+
+        $sql = "
+        INSERT INTO ficha_magia (
+            id_ficha,
+            id_magia
+        ) VALUES (
+            :id_ficha,
+            :id_magia
+        )
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':id_magia' => $idMagia
+        ]);
+    }
+
+    public function removerMagiaDaFicha(
+        int $idFicha,
+        int $idMagia,
+        int $idUsuario
+    ): void {
+        if (!$this->fichaPodeUsarMagias($idFicha, $idUsuario)) {
+            throw new RuntimeException(
+                'Esta ficha não possui acesso a magias.'
+            );
+        }
+
+        $sql = "
+        DELETE fm
+        FROM ficha_magia fm
+        INNER JOIN ficha f
+            ON f.id_ficha = fm.id_ficha
+        WHERE fm.id_ficha = :id_ficha
+          AND fm.id_magia = :id_magia
+          AND f.id_usuario = :id_usuario
+    ";
+
+        $stmt = $this->conexao->prepare($sql);
+
+        $stmt->execute([
+            ':id_ficha' => $idFicha,
+            ':id_magia' => $idMagia,
+            ':id_usuario' => $idUsuario
+        ]);
+
+        if ($stmt->rowCount() === 0) {
+            throw new RuntimeException(
+                'A magia não foi encontrada nesta ficha.'
+            );
+        }
+    }
+
     public function excluir(
         int $idFicha,
         int $idUsuario
