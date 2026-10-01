@@ -12,8 +12,10 @@ USE diario_cacador;
 -- USUÁRIO
 --
 -- id_usuario: identificador interno.
+-- nome: nome do usuário, podendo se repetir.
 -- email: identificador único para autenticação.
--- nome_exibicao: apelido público, podendo se repetir.
+-- senha: senha protegida por hash pela aplicação.
+-- ativo: indica se o usuário pode acessar o sistema.
 -- =========================================================
 
 CREATE TABLE usuario (
@@ -151,7 +153,12 @@ CREATE TABLE vestimenta (
 CREATE TABLE item (
   id_item INT UNSIGNED AUTO_INCREMENT,
   nome VARCHAR(100) NOT NULL,
-  tipo ENUM('CONSUMIVEL', 'MATERIAL', 'UTILITARIO', 'OUTRO') NOT NULL DEFAULT 'OUTRO',
+  tipo ENUM(
+    'CONSUMIVEL',
+    'MATERIAL',
+    'UTILITARIO',
+    'OUTRO'
+  ) NOT NULL DEFAULT 'OUTRO',
   descricao TEXT NULL,
   id_autor INT UNSIGNED NOT NULL,
 
@@ -480,7 +487,7 @@ CREATE TABLE ficha_vestimenta (
   ) NOT NULL,
   id_vestimenta INT UNSIGNED NOT NULL,
   pontos_protecao_atual INT UNSIGNED NOT NULL
-    CHECK (pontos_protecao_atual >= 0),
+    CHECK (pontos_protecao_atual > 0),
 
   CONSTRAINT pk_ficha_vestimenta
     PRIMARY KEY (id_ficha, tipo_slot),
@@ -506,7 +513,7 @@ CREATE TABLE profissao_item (
   id_profissao INT UNSIGNED NOT NULL,
   id_item INT UNSIGNED NOT NULL,
   quantidade INT UNSIGNED NOT NULL DEFAULT 1
-    CHECK (quantidade >= 0),
+    CHECK (quantidade > 0),
 
   CONSTRAINT pk_profissao_item
     PRIMARY KEY (id_profissao, id_item),
@@ -532,7 +539,7 @@ CREATE TABLE ficha_item (
   id_ficha INT UNSIGNED NOT NULL,
   id_item INT UNSIGNED NOT NULL,
   quantidade INT UNSIGNED NOT NULL DEFAULT 1
-    CHECK (quantidade >= 0),
+    CHECK (quantidade > 0),
 
   CONSTRAINT pk_ficha_item
     PRIMARY KEY (id_ficha, id_item),
@@ -553,13 +560,43 @@ CREATE TABLE ficha_item (
 -- =========================================================
 -- REGRAS DE APLICAÇÃO PREVISTAS PARA O BACKEND
 --
--- 1. Somente o autor pode editar ou excluir seus conteúdos.
--- 2. Conteúdo de uma profissão pública pode ser visualizado
---    em conjunto com a profissão.
--- 3. Conteúdo público de outro autor ainda não pode ser usado.
--- 4. A profissão deve ter os dois slots de vantagem preenchidos.
--- 5. tipo_slot deve corresponder ao tipo da vestimenta.
--- 6. PV e PP atuais não devem ultrapassar seus valores máximos.
--- 7. Uma vantagem não deve ser simultaneamente de magia
---    e de companheiro.
+-- 1. Somente o autor pode cadastrar relações, editar ou excluir
+--    seus conteúdos.
+--
+-- 2. Uma profissão pública e seus conteúdos relacionados podem
+--    ser visualizados por outros usuários.
+--
+-- 3. Os conteúdos relacionados a uma profissão pública não podem
+--    ser reutilizados por outro usuário.
+--
+-- 4. A profissão deve possuir os dois slots de vantagem
+--    preenchidos antes de ser utilizada na criação de uma ficha.
+--
+-- 5. Uma vantagem não pode estar simultaneamente nas tabelas
+--    vantagem_magia e vantagem_companheiro.
+--
+-- 6. O tipo da vestimenta deve corresponder ao tipo_slot em
+--    profissao_vestimenta e ficha_vestimenta.
+--
+-- 7. O PV atual da ficha não pode ultrapassar o PV máximo da
+--    profissão.
+--
+-- 8. O PV atual do companheiro não pode ultrapassar o PV máximo
+--    do companheiro cadastrado.
+--
+-- 9. O PP atual não pode ultrapassar o PP máximo da vestimenta.
+--
+-- 10. PP igual a zero remove a vestimenta da ficha.
+--
+-- 11. Quantidade igual a zero remove o item da profissão ou da
+--     ficha.
+--
+-- 12. Ao equipar uma vestimenta diferente, o PP atual começa no
+--     valor máximo. Salvar novamente a mesma vestimenta não
+--     restaura seu PP.
+--
+-- 13. Somente fichas cuja profissão possua vantagem de magia
+--     podem aprender magias.
+--
+-- 14. A ficha pertence ao usuário e permanece privada.
 -- =========================================================
