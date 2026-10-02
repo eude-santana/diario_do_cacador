@@ -99,6 +99,72 @@ class Profissao
         return $comando->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function listarPublicas(): array
+    {
+        $sql = "
+            SELECT
+                p.id_profissao,
+                p.nome,
+                p.descricao,
+                p.pv_maximo,
+                u.nome AS nome_autor
+            FROM profissao AS p
+            INNER JOIN usuario AS u
+                ON u.id_usuario = p.id_autor
+            WHERE p.visibilidade = 'PUBLICO'
+            ORDER BY p.nome, u.nome
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+        $comando->execute();
+
+        return $comando->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function buscarDetalhesPublicos(
+        int $idProfissao
+    ) {
+        $sql = "
+            SELECT
+                p.id_profissao,
+                p.nome,
+                p.descricao,
+                p.pv_maximo,
+                u.nome AS nome_autor
+            FROM profissao AS p
+            INNER JOIN usuario AS u
+                ON u.id_usuario = p.id_autor
+            WHERE p.id_profissao = :id_profissao
+              AND p.visibilidade = 'PUBLICO'
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_profissao" => $idProfissao
+        ]);
+
+        $profissao = $comando->fetch(PDO::FETCH_ASSOC);
+
+        if (!$profissao) {
+            return false;
+        }
+
+        $profissao["vantagens"] =
+            $this->buscarVantagensPublicas($idProfissao);
+
+        $profissao["armas"] =
+            $this->buscarArmasPublicas($idProfissao);
+
+        $profissao["vestimentas"] =
+            $this->buscarVestimentasPublicas($idProfissao);
+
+        $profissao["itens"] =
+            $this->buscarItensPublicos($idProfissao);
+
+        return $profissao;
+    }
+
     public function buscarPorId(
         int $idProfissao,
         int $idAutor
@@ -514,6 +580,192 @@ class Profissao
                 ":id_profissao" => $idProfissao
             ]);
         }
+    }
+
+    private function buscarVantagensPublicas(
+        int $idProfissao
+    ): array {
+        $sql = "
+            SELECT
+                pv.slot,
+                v.id_vantagem,
+                v.nome,
+                v.descricao,
+                CASE
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM vantagem_companheiro AS vc
+                        WHERE vc.id_vantagem = v.id_vantagem
+                    ) THEN 'COMPANHEIRO'
+                    WHEN EXISTS (
+                        SELECT 1
+                        FROM vantagem_magia AS vm
+                        WHERE vm.id_vantagem = v.id_vantagem
+                    ) THEN 'MAGIA'
+                    ELSE 'NORMAL'
+                END AS tipo
+            FROM profissao_vantagem AS pv
+            INNER JOIN vantagem AS v
+                ON v.id_vantagem = pv.id_vantagem
+            WHERE pv.id_profissao = :id_profissao
+            ORDER BY pv.slot
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_profissao" => $idProfissao
+        ]);
+
+        $vantagens = $comando->fetchAll(PDO::FETCH_ASSOC);
+
+        foreach ($vantagens as $indice => $vantagem) {
+            $vantagens[$indice]["magias"] = [];
+            $vantagens[$indice]["companheiros"] = [];
+
+            if ($vantagem["tipo"] === "MAGIA") {
+                $vantagens[$indice]["magias"] =
+                    $this->buscarMagiasDaVantagemPublica(
+                        (int) $vantagem["id_vantagem"]
+                    );
+            } elseif ($vantagem["tipo"] === "COMPANHEIRO") {
+                $vantagens[$indice]["companheiros"] =
+                    $this->buscarCompanheirosDaVantagemPublica(
+                        (int) $vantagem["id_vantagem"]
+                    );
+            }
+        }
+
+        return $vantagens;
+    }
+
+    private function buscarMagiasDaVantagemPublica(
+        int $idVantagem
+    ): array {
+        $sql = "
+            SELECT
+                m.nome,
+                m.elemento,
+                m.descricao
+            FROM vantagem_magia AS vm
+            INNER JOIN magia AS m
+                ON m.id_magia = vm.id_magia
+            WHERE vm.id_vantagem = :id_vantagem
+            ORDER BY m.nome
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_vantagem" => $idVantagem
+        ]);
+
+        return $comando->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function buscarCompanheirosDaVantagemPublica(
+        int $idVantagem
+    ): array {
+        $sql = "
+            SELECT
+                c.tipo,
+                c.pv_maximo,
+                c.dano,
+                c.descricao
+            FROM vantagem_companheiro AS vc
+            INNER JOIN companheiro_animal AS c
+                ON c.id_companheiro = vc.id_companheiro
+            WHERE vc.id_vantagem = :id_vantagem
+            ORDER BY c.tipo
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_vantagem" => $idVantagem
+        ]);
+
+        return $comando->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function buscarArmasPublicas(
+        int $idProfissao
+    ): array {
+        $sql = "
+            SELECT
+                pa.slot,
+                a.nome,
+                a.tipo,
+                a.maos,
+                a.dano,
+                a.especial
+            FROM profissao_arma AS pa
+            INNER JOIN arma AS a
+                ON a.id_arma = pa.id_arma
+            WHERE pa.id_profissao = :id_profissao
+            ORDER BY pa.slot
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_profissao" => $idProfissao
+        ]);
+
+        return $comando->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function buscarVestimentasPublicas(
+        int $idProfissao
+    ): array {
+        $sql = "
+            SELECT
+                pv.tipo_slot,
+                v.nome,
+                v.tipo,
+                v.pontos_protecao_maximo,
+                v.dano,
+                v.elemento,
+                v.especial
+            FROM profissao_vestimenta AS pv
+            INNER JOIN vestimenta AS v
+                ON v.id_vestimenta = pv.id_vestimenta
+            WHERE pv.id_profissao = :id_profissao
+            ORDER BY pv.tipo_slot
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_profissao" => $idProfissao
+        ]);
+
+        return $comando->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    private function buscarItensPublicos(
+        int $idProfissao
+    ): array {
+        $sql = "
+            SELECT
+                pi.quantidade,
+                i.nome,
+                i.tipo,
+                i.descricao
+            FROM profissao_item AS pi
+            INNER JOIN item AS i
+                ON i.id_item = pi.id_item
+            WHERE pi.id_profissao = :id_profissao
+            ORDER BY i.nome
+        ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_profissao" => $idProfissao
+        ]);
+
+        return $comando->fetchAll(PDO::FETCH_ASSOC);
     }
 
     private function validarVantagens(

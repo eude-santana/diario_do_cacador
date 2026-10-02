@@ -66,6 +66,10 @@ $mensagemErro =
                 Cadastrar nova profissão
             </a>
 
+            <a href="/Controllers/ProfissaoController.php?acao=publicas">
+                Ver profissões públicas
+            </a>
+
             <a href="/Views/Usuario/painel.php">
                 Voltar ao painel
             </a>
