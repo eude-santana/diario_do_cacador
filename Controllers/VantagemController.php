@@ -24,20 +24,26 @@ $tiposPermitidos = [
  * Converte os valores recebidos pelo formulário em uma lista
  * de identificadores inteiros, positivos e sem duplicações.
  */
-function normalizarIds(mixed $ids): array
+function normalizarIds($ids): array
 {
     if (!is_array($ids)) {
         return [];
     }
 
-    $idsNormalizados = array_map("intval", $ids);
+    $idsNormalizados = [];
 
-    $idsNormalizados = array_filter(
-        $idsNormalizados,
-        fn(int $id): bool => $id > 0
-    );
+    foreach ($ids as $id) {
+        $id = (int) $id;
 
-    return array_values(array_unique($idsNormalizados));
+        if (
+            $id > 0
+            && !in_array($id, $idsNormalizados, true)
+        ) {
+            $idsNormalizados[] = $id;
+        }
+    }
+
+    return $idsNormalizados;
 }
 
 /**
@@ -119,7 +125,10 @@ switch ($acao) {
 
     case "cadastrar":
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-            header("Location: VantagemController.php?acao=novo");
+            header(
+                "Location: /Controllers/VantagemController.php"
+                . "?acao=novo"
+            );
             exit;
         }
 
@@ -185,11 +194,11 @@ switch ($acao) {
                 );
 
                 header(
-                    "Location: VantagemController.php"
+                    "Location: /Controllers/VantagemController.php"
                     . "?acao=listar&sucesso=cadastro"
                 );
                 exit;
-            } catch (Throwable $erroInterno) {
+            } catch (PDOException $erroInterno) {
                 $erro = "Não foi possível cadastrar a vantagem.";
             }
         }
@@ -215,7 +224,7 @@ switch ($acao) {
 
         if (!$idVantagem) {
             header(
-                "Location: VantagemController.php"
+                "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&erro=id_invalido"
             );
             exit;
@@ -228,7 +237,7 @@ switch ($acao) {
 
         if (!$vantagem) {
             header(
-                "Location: VantagemController.php"
+                "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&erro=nao_encontrada"
             );
             exit;
@@ -264,7 +273,8 @@ switch ($acao) {
     case "atualizar":
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             header(
-                "Location: VantagemController.php?acao=listar"
+                "Location: /Controllers/VantagemController.php"
+                . "?acao=listar"
             );
             exit;
         }
@@ -344,11 +354,11 @@ switch ($acao) {
                 );
 
                 header(
-                    "Location: VantagemController.php"
+                    "Location: /Controllers/VantagemController.php"
                     . "?acao=listar&sucesso=edicao"
                 );
                 exit;
-            } catch (Throwable $erroInterno) {
+            } catch (PDOException $erroInterno) {
                 $erro = "Não foi possível atualizar a vantagem.";
             }
         }
@@ -374,7 +384,8 @@ switch ($acao) {
     case "excluir":
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             header(
-                "Location: VantagemController.php?acao=listar"
+                "Location: /Controllers/VantagemController.php"
+                . "?acao=listar"
             );
             exit;
         }
@@ -387,7 +398,7 @@ switch ($acao) {
 
         if (!$idVantagem) {
             header(
-                "Location: VantagemController.php"
+                "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&erro=id_invalido"
             );
             exit;
@@ -401,28 +412,28 @@ switch ($acao) {
 
             if (!$excluiu) {
                 header(
-                    "Location: VantagemController.php"
+                    "Location: /Controllers/VantagemController.php"
                     . "?acao=listar&erro=nao_encontrada"
                 );
                 exit;
             }
 
             header(
-                "Location: VantagemController.php"
+                "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&sucesso=exclusao"
             );
             exit;
         } catch (PDOException $erroInterno) {
             if ($erroInterno->getCode() === "23000") {
                 header(
-                    "Location: VantagemController.php"
+                    "Location: /Controllers/VantagemController.php"
                     . "?acao=listar&erro=em_uso"
                 );
                 exit;
             }
 
             header(
-                "Location: VantagemController.php"
+                "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&erro=exclusao"
             );
             exit;

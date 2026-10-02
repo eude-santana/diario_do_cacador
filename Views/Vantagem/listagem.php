@@ -75,11 +75,11 @@ $mensagemErro =
         <?php endif; ?>
 
         <nav>
-            <a href="VantagemController.php?acao=novo">
+            <a href="/Controllers/VantagemController.php?acao=novo">
                 Cadastrar nova vantagem
             </a>
 
-            <a href="../Views/Usuario/painel.php">
+            <a href="/Views/Usuario/painel.php">
                 Voltar ao painel
             </a>
         </nav>
@@ -150,11 +150,11 @@ $mensagemErro =
                             </td>
 
                             <td>
-                                <a href="VantagemController.php?acao=editar&id=<?= $idVantagem ?>">
+                                <a href="/Controllers/VantagemController.php?acao=editar&id=<?= $idVantagem ?>">
                                     Editar
                                 </a>
 
-                                <form action="VantagemController.php" method="POST" style="display: inline;"
+                                <form action="/Controllers/VantagemController.php" method="POST" style="display: inline;"
                                     onsubmit="return confirmarExclusao();">
                                     <input type="hidden" name="acao" value="excluir">
 

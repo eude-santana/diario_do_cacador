@@ -61,7 +61,7 @@ $descricao = $vantagem["descricao"] ?? "";
         <?php endif; ?>
 
         <form
-            action="VantagemController.php"
+            action="/Controllers/VantagemController.php"
             method="POST"
         >
             <input
@@ -167,7 +167,9 @@ $descricao = $vantagem["descricao"] ?? "";
                         Nenhuma magia cadastrada.
                     </p>
 
-                    <a href="MagiaController.php?acao=novo">
+                    <a
+                        href="/Controllers/MagiaController.php?acao=novo"
+                    >
                         Cadastrar magia
                     </a>
                 <?php else: ?>
@@ -213,7 +215,7 @@ $descricao = $vantagem["descricao"] ?? "";
                     </p>
 
                     <a
-                        href="CompanheiroAnimalController.php?acao=novo"
+                        href="/Controllers/CompanheiroAnimalController.php?acao=novo"
                     >
                         Cadastrar companheiro animal
                     </a>
@@ -259,7 +261,9 @@ $descricao = $vantagem["descricao"] ?? "";
                     Salvar alterações
                 </button>
 
-                <a href="VantagemController.php?acao=listar">
+                <a
+                    href="/Controllers/VantagemController.php?acao=listar"
+                >
                     Cancelar
                 </a>
             </div>

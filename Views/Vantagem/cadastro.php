@@ -51,7 +51,10 @@ $idsCompanheirosSelecionados = $idsCompanheirosSelecionados ?? [];
         <?php endif; ?>
 
 
-        <form action="../../Controllers/VantagemController.php" method="POST">
+        <form
+            action="/Controllers/VantagemController.php"
+            method="POST"
+        >
             <input type="hidden" name="acao" value="cadastrar">
 
             <div>
@@ -143,7 +146,9 @@ $idsCompanheirosSelecionados = $idsCompanheirosSelecionados ?? [];
                         Nenhuma magia cadastrada.
                     </p>
 
-                    <a href="/Views/Magia/cadastro.php">
+                    <a
+                        href="/Controllers/MagiaController.php?acao=novo"
+                    >
                         Cadastrar magia
                     </a>
                 <?php else: ?>
@@ -188,7 +193,9 @@ $idsCompanheirosSelecionados = $idsCompanheirosSelecionados ?? [];
                         Nenhum companheiro animal cadastrado.
                     </p>
 
-                    <a href="/Views/CompanheiroAnimal/cadastro.php">
+                    <a
+                        href="/Controllers/CompanheiroAnimalController.php?acao=novo"
+                    >
                         Cadastrar companheiro animal
                     </a>
                     
@@ -234,7 +241,9 @@ $idsCompanheirosSelecionados = $idsCompanheirosSelecionados ?? [];
                     Cadastrar
                 </button>
 
-                <a href="VantagemController.php?acao=listar">
+                <a
+                    href="/Controllers/VantagemController.php?acao=listar"
+                >
                     Cancelar
                 </a>
             </div>
