@@ -83,7 +83,7 @@ $nomesTiposItem = [
             </p>
         <?php endif; ?>
 
-        <form action="ProfissaoController.php" method="POST" id="form-profissao">
+        <form action="/Controllers/ProfissaoController.php" method="POST" id="form-profissao">
             <input type="hidden" name="acao" value="cadastrar">
 
             <fieldset>
@@ -155,7 +155,7 @@ $nomesTiposItem = [
                         Nenhuma vantagem cadastrada.
                     </p>
 
-                    <a href="VantagemController.php?acao=novo">
+                    <a href="/Controllers/VantagemController.php?acao=novo">
                         Cadastrar vantagem
                     </a>
                 <?php else: ?>
@@ -265,7 +265,7 @@ $nomesTiposItem = [
                         Nenhuma arma cadastrada.
                     </p>
 
-                    <a href="ArmaController.php?acao=novo">
+                    <a href="/Controllers/ArmaController.php?acao=novo">
                         Cadastrar arma
                     </a>
                 <?php else: ?>
@@ -331,7 +331,7 @@ $nomesTiposItem = [
                         Nenhuma vestimenta cadastrada.
                     </p>
 
-                    <a href="VestimentaController.php?acao=novo">
+                    <a href="/Controllers/VestimentaController.php?acao=novo">
                         Cadastrar vestimenta
                     </a>
                 <?php else: ?>
@@ -387,12 +387,14 @@ $nomesTiposItem = [
 
                                         <?php if (
                                             isset(
-                                            $vestimenta["pp_maximo"]
+                                            $vestimenta[
+                                                "pontos_protecao_maximo"
+                                            ]
                                         )
                                         ): ?>
                                             -
                                             <?= (int) $vestimenta[
-                                                "pp_maximo"
+                                                "pontos_protecao_maximo"
                                             ] ?> PP
                                         <?php endif; ?>
                                     </option>
@@ -416,7 +418,7 @@ $nomesTiposItem = [
                         Nenhum item cadastrado.
                     </p>
 
-                    <a href="ItemController.php?acao=novo">
+                    <a href="/Controllers/ItemController.php?acao=novo">
                         Cadastrar item
                     </a>
                 <?php else: ?>
@@ -509,14 +511,14 @@ $nomesTiposItem = [
                     Cadastrar profissão
                 </button>
 
-                <a href="ProfissaoController.php?acao=listar">
+                <a href="/Controllers/ProfissaoController.php?acao=listar">
                     Cancelar
                 </a>
             </div>
         </form>
 
         <p>
-            <a href="../Views/Usuario/painel.php">
+            <a href="/Views/Usuario/painel.php">
                 Voltar ao painel
             </a>
         </p>

@@ -277,7 +277,8 @@ switch ($acao) {
     case "cadastrar":
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             header(
-                "Location: ProfissaoController.php?acao=novo"
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=novo"
             );
             exit;
         }
@@ -308,11 +309,11 @@ switch ($acao) {
                 );
 
                 header(
-                    "Location: ProfissaoController.php"
+                    "Location: /Controllers/ProfissaoController.php"
                     . "?acao=listar&sucesso=cadastro"
                 );
                 exit;
-            } catch (Throwable $erroInterno) {
+            } catch (PDOException $erroInterno) {
                 $erro = "Não foi possível cadastrar a profissão.";
             }
         }
@@ -352,9 +353,9 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
-        if (!$idProfissao) {
+        if (!$idProfissao || $idProfissao <= 0) {
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=id_invalido"
             );
             exit;
@@ -367,7 +368,7 @@ switch ($acao) {
 
         if (!$profissao) {
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=nao_encontrada"
             );
             exit;
@@ -438,7 +439,8 @@ switch ($acao) {
     case "atualizar":
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             header(
-                "Location: ProfissaoController.php?acao=listar"
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=listar"
             );
             exit;
         }
@@ -449,9 +451,9 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
-        if (!$idProfissao) {
+        if (!$idProfissao || $idProfissao <= 0) {
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=id_invalido"
             );
             exit;
@@ -464,7 +466,7 @@ switch ($acao) {
             )
         ) {
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=nao_encontrada"
             );
             exit;
@@ -498,14 +500,14 @@ switch ($acao) {
 
                 if ($atualizou) {
                     header(
-                        "Location: ProfissaoController.php"
+                        "Location: /Controllers/ProfissaoController.php"
                         . "?acao=listar&sucesso=edicao"
                     );
                     exit;
                 }
 
                 $erro = "Profissão não encontrada.";
-            } catch (Throwable $erroInterno) {
+            } catch (PDOException $erroInterno) {
                 $erro = "Não foi possível atualizar a profissão.";
             }
         }
@@ -542,7 +544,8 @@ switch ($acao) {
     case "excluir":
         if ($_SERVER["REQUEST_METHOD"] !== "POST") {
             header(
-                "Location: ProfissaoController.php?acao=listar"
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=listar"
             );
             exit;
         }
@@ -553,9 +556,9 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
-        if (!$idProfissao) {
+        if (!$idProfissao || $idProfissao <= 0) {
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=id_invalido"
             );
             exit;
@@ -569,28 +572,28 @@ switch ($acao) {
 
             if (!$excluiu) {
                 header(
-                    "Location: ProfissaoController.php"
+                    "Location: /Controllers/ProfissaoController.php"
                     . "?acao=listar&erro=nao_encontrada"
                 );
                 exit;
             }
 
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&sucesso=exclusao"
             );
             exit;
         } catch (PDOException $erroInterno) {
             if ($erroInterno->getCode() === "23000") {
                 header(
-                    "Location: ProfissaoController.php"
+                    "Location: /Controllers/ProfissaoController.php"
                     . "?acao=listar&erro=em_uso"
                 );
                 exit;
             }
 
             header(
-                "Location: ProfissaoController.php"
+                "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=exclusao"
             );
             exit;

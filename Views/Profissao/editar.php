@@ -85,7 +85,7 @@ $nomesTiposItem = [
         <?php endif; ?>
 
         <form
-            action="ProfissaoController.php"
+            action="/Controllers/ProfissaoController.php"
             method="POST"
             id="form-profissao"
         >
@@ -535,7 +535,7 @@ $nomesTiposItem = [
                     Salvar alterações
                 </button>
 
-                <a href="ProfissaoController.php?acao=listar">
+                <a href="/Controllers/ProfissaoController.php?acao=listar">
                     Cancelar
                 </a>
             </div>
