@@ -57,14 +57,6 @@ function escaparGerenciamento(mixed $valor): string
         </p>
     <?php endif; ?>
 
-    <?php if (($_GET['sucesso'] ?? '') === 'magia_adicionada'): ?>
-        <p>Magia adicionada à ficha com sucesso.</p>
-    <?php endif; ?>
-
-    <?php if (($_GET['sucesso'] ?? '') === 'magia_removida'): ?>
-        <p>Magia removida da ficha com sucesso.</p>
-    <?php endif; ?>
-
     <section>
         <h2>Dados do personagem</h2>
 
