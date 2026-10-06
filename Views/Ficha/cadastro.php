@@ -26,7 +26,7 @@ $idCompanheiroSelecionado =
 
 $erro = $erro ?? '';
 
-function escaparFicha(mixed $valor): string
+function escaparFicha($valor): string
 {
     return htmlspecialchars(
         (string) $valor,

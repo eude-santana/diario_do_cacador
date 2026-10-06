@@ -43,7 +43,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="nome">Nome:</label>
 
             <input type="text" id="nome" name="nome" maxlength="100" value="<?php
-            echo htmlspecialchars($magia["nome"]);
+            echo htmlspecialchars(
+                $magia["nome"],
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?>" required>
         </div>
 
@@ -51,7 +55,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="elemento">Elemento:</label>
 
             <input type="text" id="elemento" name="elemento" maxlength="50" value="<?php
-            echo htmlspecialchars($magia["elemento"]);
+            echo htmlspecialchars(
+                $magia["elemento"],
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?>" required>
         </div>
 
@@ -59,7 +67,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="descricao">Descrição:</label>
 
             <textarea id="descricao" name="descricao" rows="5" cols="40"><?php
-            echo htmlspecialchars($magia["descricao"] ?? "");
+            echo htmlspecialchars(
+                $magia["descricao"] ?? "",
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?></textarea>
         </div>
 

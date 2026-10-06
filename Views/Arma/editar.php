@@ -49,7 +49,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="nome">Nome:</label>
 
             <input type="text" id="nome" name="nome" maxlength="100" value="<?php
-            echo htmlspecialchars($arma["nome"]);
+            echo htmlspecialchars(
+                $arma["nome"],
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?>" required>
         </div>
 
@@ -101,7 +105,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="dano">Dano:</label>
 
             <input type="text" id="dano" name="dano" maxlength="50" value="<?php
-            echo htmlspecialchars($arma["dano"]);
+            echo htmlspecialchars(
+                $arma["dano"],
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?>" required>
         </div>
 
@@ -109,7 +117,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="especial">Especial:</label>
 
             <textarea id="especial" name="especial" rows="5" cols="40"><?php
-            echo htmlspecialchars($arma["especial"] ?? "");
+            echo htmlspecialchars(
+                $arma["especial"] ?? "",
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?></textarea>
         </div>
 

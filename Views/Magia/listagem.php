@@ -65,13 +65,21 @@ if (!isset($magias)) {
                     <tr>
                         <td>
                             <?php
-                            echo htmlspecialchars($magia["nome"]);
+                            echo htmlspecialchars(
+                                $magia["nome"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            );
                             ?>
                         </td>
 
                         <td>
                             <?php
-                            echo htmlspecialchars($magia["elemento"]);
+                            echo htmlspecialchars(
+                                $magia["elemento"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            );
                             ?>
                         </td>
 
@@ -79,7 +87,9 @@ if (!isset($magias)) {
                             <?php
                             echo nl2br(
                                 htmlspecialchars(
-                                    $magia["descricao"] ?? ""
+                                    $magia["descricao"] ?? "",
+                                    ENT_QUOTES,
+                                    "UTF-8"
                                 )
                             );
                             ?>

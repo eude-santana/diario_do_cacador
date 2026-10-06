@@ -77,7 +77,9 @@ if (!isset($companheiros)) {
                         <td>
                             <?php
                             echo htmlspecialchars(
-                                $companheiro["tipo"]
+                                $companheiro["tipo"],
+                                ENT_QUOTES,
+                                "UTF-8"
                             );
                             ?>
                         </td>
@@ -92,7 +94,9 @@ if (!isset($companheiros)) {
                             <?php if (($companheiro["dano"] ?? "") !== ""): ?>
                                 <?php
                                 echo htmlspecialchars(
-                                    $companheiro["dano"]
+                                    $companheiro["dano"],
+                                    ENT_QUOTES,
+                                    "UTF-8"
                                 );
                                 ?>
                             <?php else: ?>
@@ -104,7 +108,9 @@ if (!isset($companheiros)) {
                             <?php
                             echo nl2br(
                                 htmlspecialchars(
-                                    $companheiro["descricao"] ?? ""
+                                    $companheiro["descricao"] ?? "",
+                                    ENT_QUOTES,
+                                    "UTF-8"
                                 )
                             );
                             ?>

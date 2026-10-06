@@ -4,7 +4,7 @@ $fichas = $fichas ?? [];
 $erro = $erro ?? '';
 $mensagem = $mensagem ?? '';
 
-function escaparListagemFicha(mixed $valor): string
+function escaparListagemFicha($valor): string
 {
     return htmlspecialchars(
         (string) $valor,

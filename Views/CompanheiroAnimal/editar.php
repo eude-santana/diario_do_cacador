@@ -53,7 +53,11 @@ $erro = $_GET["erro"] ?? "";
             <label for="tipo">Tipo de animal:</label>
 
             <input type="text" id="tipo" name="tipo" maxlength="100" value="<?php
-            echo htmlspecialchars($companheiro["tipo"]);
+            echo htmlspecialchars(
+                $companheiro["tipo"],
+                ENT_QUOTES,
+                "UTF-8"
+            );
             ?>" required>
         </div>
 
@@ -70,7 +74,9 @@ $erro = $_GET["erro"] ?? "";
 
             <input type="text" id="dano" name="dano" maxlength="50" value="<?php
             echo htmlspecialchars(
-                $companheiro["dano"] ?? ""
+                $companheiro["dano"] ?? "",
+                ENT_QUOTES,
+                "UTF-8"
             );
             ?>">
         </div>
@@ -80,7 +86,9 @@ $erro = $_GET["erro"] ?? "";
 
             <textarea id="descricao" name="descricao" rows="5" cols="40"><?php
             echo htmlspecialchars(
-                $companheiro["descricao"] ?? ""
+                $companheiro["descricao"] ?? "",
+                ENT_QUOTES,
+                "UTF-8"
             );
             ?></textarea>
         </div>

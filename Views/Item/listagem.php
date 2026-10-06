@@ -71,19 +71,33 @@ $nomesTipos = [
                 <?php foreach ($itens as $item): ?>
                     <tr>
                         <td>
-                            <?php echo htmlspecialchars($item["nome"]); ?>
-                        </td>
-
-                        <td>
                             <?php
-                            echo htmlspecialchars($nomesTipos[$item["tipo"]]);
+                            echo htmlspecialchars(
+                                $item["nome"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            );
                             ?>
                         </td>
 
                         <td>
                             <?php
                             echo htmlspecialchars(
-                                $item["descricao"] ?? ""
+                                $nomesTipos[$item["tipo"]],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            );
+                            ?>
+                        </td>
+
+                        <td>
+                            <?php
+                            echo nl2br(
+                                htmlspecialchars(
+                                    $item["descricao"] ?? "",
+                                    ENT_QUOTES,
+                                    "UTF-8"
+                                )
                             );
                             ?>
                         </td>

@@ -65,7 +65,11 @@ if (!isset($armas)) {
                 <?php foreach ($armas as $arma): ?>
                     <tr>
                         <td>
-                            <?php echo htmlspecialchars($arma["nome"]); ?>
+                            <?php echo htmlspecialchars(
+                                $arma["nome"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            ); ?>
                         </td>
 
                         <td>
@@ -89,13 +93,21 @@ if (!isset($armas)) {
                         </td>
 
                         <td>
-                            <?php echo htmlspecialchars($arma["dano"]); ?>
+                            <?php echo htmlspecialchars(
+                                $arma["dano"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            ); ?>
                         </td>
 
                         <td>
                             <?php
                             echo nl2br(
-                                htmlspecialchars($arma["especial"] ?? "")
+                                htmlspecialchars(
+                                    $arma["especial"] ?? "",
+                                    ENT_QUOTES,
+                                    "UTF-8"
+                                )
                             );
                             ?>
                         </td>

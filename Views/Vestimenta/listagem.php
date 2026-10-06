@@ -77,7 +77,9 @@ if (!isset($vestimentas)) {
                         <td>
                             <?php
                             echo htmlspecialchars(
-                                $vestimenta["nome"]
+                                $vestimenta["nome"],
+                                ENT_QUOTES,
+                                "UTF-8"
                             );
                             ?>
                         </td>
@@ -110,7 +112,9 @@ if (!isset($vestimentas)) {
                             <?php if (($vestimenta["dano"] ?? "") !== ""): ?>
                                 <?php
                                 echo htmlspecialchars(
-                                    $vestimenta["dano"]
+                                    $vestimenta["dano"],
+                                    ENT_QUOTES,
+                                    "UTF-8"
                                 );
                                 ?>
                             <?php else: ?>
@@ -122,7 +126,9 @@ if (!isset($vestimentas)) {
                             <?php if (($vestimenta["elemento"] ?? "") !== ""): ?>
                                 <?php
                                 echo htmlspecialchars(
-                                    $vestimenta["elemento"]
+                                    $vestimenta["elemento"],
+                                    ENT_QUOTES,
+                                    "UTF-8"
                                 );
                                 ?>
                             <?php else: ?>
@@ -134,7 +140,9 @@ if (!isset($vestimentas)) {
                             <?php
                             echo nl2br(
                                 htmlspecialchars(
-                                    $vestimenta["especial"] ?? ""
+                                    $vestimenta["especial"] ?? "",
+                                    ENT_QUOTES,
+                                    "UTF-8"
                                 )
                             );
                             ?>
