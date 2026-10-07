@@ -94,6 +94,8 @@ $mensagemErro =
                 <tbody>
                     <?php foreach ($profissoes as $profissao): ?>
                         <?php
+                        $emUso = (bool) ($profissao["em_uso"] ?? false);
+
                         $idProfissao =
                             (int) $profissao["id_profissao"];
 
@@ -145,20 +147,22 @@ $mensagemErro =
                             </td>
 
                             <td>
-                                <a href="/Controllers/ProfissaoController.php?acao=editar&id=<?= $idProfissao ?>">
-                                    Editar
-                                </a>
+                                <?php if ($emUso): ?>
+                                    <span>A profissão está sendo utilizada por uma ficha e não pode ser alterada ou excluída.</span>
+                                <?php else: ?>
+                                    <a href="/Controllers/ProfissaoController.php?acao=editar&id=<?= $idProfissao ?>">
+                                        Editar
+                                    </a>
 
-                                <form action="/Controllers/ProfissaoController.php" method="POST" style="display: inline;"
-                                    onsubmit="return confirmarExclusao();">
-                                    <input type="hidden" name="acao" value="excluir">
+                                    <form action="/Controllers/ProfissaoController.php" method="POST" style="display: inline;"
+                                        onsubmit="return confirmarExclusao();">
+                                        <input type="hidden" name="acao" value="excluir">
 
-                                    <input type="hidden" name="id_profissao" value="<?= $idProfissao ?>">
+                                        <input type="hidden" name="id_profissao" value="<?= $idProfissao ?>">
 
-                                    <button type="submit">
-                                        Excluir
-                                    </button>
-                                </form>
+                                        <button type="submit">Excluir</button>
+                                    </form>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

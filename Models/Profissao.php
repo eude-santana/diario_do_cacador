@@ -80,14 +80,19 @@ class Profissao
     {
         $sql = "
             SELECT
-                id_profissao,
-                nome,
-                descricao,
-                pv_maximo,
-                visibilidade
-            FROM profissao
-            WHERE id_autor = :id_autor
-            ORDER BY nome
+                p.id_profissao,
+                p.nome,
+                p.descricao,
+                p.pv_maximo,
+                p.visibilidade,
+                EXISTS (
+                    SELECT 1
+                    FROM ficha AS f
+                    WHERE f.id_profissao = p.id_profissao
+                ) AS em_uso
+            FROM profissao AS p
+            WHERE p.id_autor = :id_autor
+            ORDER BY p.nome
         ";
 
         $comando = $this->conexao->prepare($sql);
@@ -97,6 +102,30 @@ class Profissao
         ]);
 
         return $comando->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function estaEmUso(
+        int $idProfissao,
+        int $idAutor
+    ): bool {
+        $sql = "
+        SELECT 1
+        FROM ficha AS f
+        INNER JOIN profissao AS p
+            ON p.id_profissao = f.id_profissao
+        WHERE f.id_profissao = :id_profissao
+          AND p.id_autor = :id_autor
+        LIMIT 1
+    ";
+
+        $comando = $this->conexao->prepare($sql);
+
+        $comando->execute([
+            ":id_profissao" => $idProfissao,
+            ":id_autor" => $idAutor
+        ]);
+
+        return $comando->fetchColumn() !== false;
     }
 
     public function listarPublicas(): array

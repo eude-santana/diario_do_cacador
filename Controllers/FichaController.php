@@ -377,6 +377,8 @@ function listarFichas(
         $erro = 'Ficha não encontrada ou pertencente a outro usuário.';
     } elseif ($codigoErro === 'banco') {
         $erro = 'Não foi possível excluir a ficha.';
+    } elseif ($codigoErro === 'dados_invalidos') {
+        $erro = 'Os dados informados são inválidos.';
     }
 
     try {
@@ -463,7 +465,12 @@ function gerenciarFicha(
     }
 
     $mensagem = '';
-    $erro = '';
+
+    $erro = $_GET['erro'] ?? '';
+
+    if (!is_string($erro)) {
+        $erro = '';
+    }
 
     $sucesso = $_GET['sucesso'] ?? '';
 
@@ -479,6 +486,10 @@ function gerenciarFicha(
         $mensagem = 'Vestimenta equipada com sucesso.';
     } elseif ($sucesso === 'protecao') {
         $mensagem = 'Pontos de proteção atualizados com sucesso.';
+    } elseif ($sucesso === 'magia_adicionada') {
+        $mensagem = 'Magia adicionada com sucesso.';
+    } elseif ($sucesso === 'magia_removida') {
+        $mensagem = 'Magia removida com sucesso.';
     }
 
 
@@ -709,12 +720,17 @@ function atualizarArmaFicha(
         $_POST['slot'] ?? null
     );
 
-    /*
-     * Campo vazio representa um slot sem arma.
-     */
     $idArma = lerIdOpcionalFicha(
         $_POST['id_arma'] ?? null
     );
+
+    if ($idFicha === null || $slot === null) {
+        header(
+            'Location: /Controllers/FichaController.php'
+            . '?acao=listar&erro=ficha_invalida'
+        );
+        exit;
+    }
 
     if ($idArma === false) {
         exibirGerenciamentoFicha(
@@ -725,14 +741,6 @@ function atualizarArmaFicha(
         );
 
         return;
-    }
-
-    if ($idFicha === null || $slot === null) {
-        header(
-            'Location: /Controllers/FichaController.php'
-            . '?acao=listar&erro=ficha_invalida'
-        );
-        exit;
     }
 
     try {
@@ -1146,7 +1154,7 @@ function exibirGerenciamentoFicha(
 }
 
 function lerInteiroNaoNegativoFicha(
-    mixed $valor
+    $valor
 ): ?int {
     $numero = filter_var(
         $valor,
@@ -1171,7 +1179,7 @@ function lerInteiroNaoNegativoFicha(
  * Campos vazios retornam null, o que é necessário porque
  * magia e companheiro são opcionais dependendo da profissão.
  */
-function lerIdFicha(mixed $valor): ?int
+function lerIdFicha($valor): ?int
 {
     if ($valor === null || $valor === '') {
         return null;
@@ -1195,7 +1203,7 @@ function lerIdFicha(mixed $valor): ?int
 }
 
 function lerIdOpcionalFicha(
-    mixed $valor
+    $valor
 ): mixed {
     if ($valor === null || $valor === '') {
         return null;

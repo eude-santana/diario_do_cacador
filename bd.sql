@@ -1,5 +1,5 @@
 -- =========================================================
--- DIÁIO DO CAÇADOR
+-- DIÁRIO DO CAÇADOR
 -- =========================================================
 
 CREATE DATABASE IF NOT EXISTS diario_cacador

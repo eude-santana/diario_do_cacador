@@ -222,7 +222,7 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
-        if (!$idVantagem) {
+        if (!$idVantagem || $idVantagem <= 0) {
             header(
                 "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&erro=id_invalido"
@@ -300,7 +300,7 @@ switch ($acao) {
         $erro = "";
         $idsRelacionados = [];
 
-        if (!$idVantagem) {
+        if (!$idVantagem || $idVantagem <= 0) {
             $erro = "A vantagem informada é inválida.";
         } elseif (
             !$vantagemModel->buscarPorId($idVantagem, $idAutor)
@@ -396,7 +396,7 @@ switch ($acao) {
             FILTER_VALIDATE_INT
         );
 
-        if (!$idVantagem) {
+        if (!$idVantagem || $idVantagem <= 0) {
             header(
                 "Location: /Controllers/VantagemController.php"
                 . "?acao=listar&erro=id_invalido"

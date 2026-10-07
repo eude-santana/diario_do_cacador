@@ -650,6 +650,18 @@ function escaparFicha($valor): string
                                     <?php
                                     echo escaparFicha($item['tipo']);
                                     ?>
+
+                                    <?php if (!empty($item['descricao'])): ?>
+                                        <p>
+                                            <?php
+                                            echo nl2br(
+                                                escaparFicha(
+                                                    $item['descricao']
+                                                )
+                                            );
+                                            ?>
+                                        </p>
+                                    <?php endif; ?>
                                 </li>
                             <?php endforeach; ?>
                         </ul>

@@ -361,6 +361,19 @@ switch ($acao) {
             exit;
         }
 
+        if (
+            $profissaoModel->estaEmUso(
+                $idProfissao,
+                $idAutor
+            )
+        ) {
+            header(
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=listar&erro=em_uso"
+            );
+            exit;
+        }
+
         $profissao = $profissaoModel->buscarPorId(
             $idProfissao,
             $idAutor
@@ -455,6 +468,19 @@ switch ($acao) {
             header(
                 "Location: /Controllers/ProfissaoController.php"
                 . "?acao=listar&erro=id_invalido"
+            );
+            exit;
+        }
+
+        if (
+            $profissaoModel->estaEmUso(
+                $idProfissao,
+                $idAutor
+            )
+        ) {
+            header(
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=listar&erro=em_uso"
             );
             exit;
         }
@@ -600,6 +626,52 @@ switch ($acao) {
         }
 
     case "listar":
+        $profissoes = $profissaoModel->listarPorAutor(
+            $idAutor
+        );
+
+        require __DIR__ . "/../Views/Profissao/listagem.php";
+        break;
+
+    case "publicas":
+        $profissoesPublicas =
+            $profissaoModel->listarPublicas();
+
+        require __DIR__ . "/../Views/Profissao/publicas.php";
+        break;
+
+    case "visualizar":
+        $idProfissao = filter_input(
+            INPUT_GET,
+            "id",
+            FILTER_VALIDATE_INT
+        );
+
+        if (!$idProfissao || $idProfissao <= 0) {
+            header(
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=publicas&erro=id_invalido"
+            );
+            exit;
+        }
+
+        $profissao =
+            $profissaoModel->buscarDetalhesPublicos(
+                $idProfissao
+            );
+
+        if (!$profissao) {
+            header(
+                "Location: /Controllers/ProfissaoController.php"
+                . "?acao=publicas&erro=nao_encontrada"
+            );
+            exit;
+        }
+
+        require __DIR__
+            . "/../Views/Profissao/visualizar.php";
+        break;
+
     default:
         $profissoes = $profissaoModel->listarPorAutor(
             $idAutor
