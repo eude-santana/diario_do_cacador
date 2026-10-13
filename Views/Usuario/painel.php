@@ -12,86 +12,152 @@ exigirLogin();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
     <title>Painel — Diário do Caçador</title>
 </head>
 
 <body>
-    <h1>Diário do Caçador</h1>
+    <main class="pagina" aria-labelledby="titulo-pagina">
+        <header class="painel-cabecalho">
+            <div class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">Diário de campo</p>
 
-    <p>
-        Bem-vindo,
-        <?php echo htmlspecialchars(
-            $_SESSION["nome_usuario"] ?? "",
-            ENT_QUOTES,
-            "UTF-8"
-        ); ?>!
-    </p>
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Diário do Caçador
+                </h1>
 
-    <p>Login realizado com sucesso.</p>
+                <p class="painel__saudacao">
+                    Bem-vindo,
+                    <strong><?php echo htmlspecialchars(
+                        $_SESSION["nome_usuario"] ?? "",
+                        ENT_QUOTES,
+                        "UTF-8"
+                    ); ?></strong>!
+                </p>
+            </div>
 
-    <nav>
-        <h2>Menu</h2>
+            <form class="formulario-saida" action="/Controllers/LogoutController.php" method="POST">
+                <button class="botao botao--secundario" type="submit">Sair</button>
+            </form>
+        </header>
 
-        <ul>
-            <li>
-                <a href="/Controllers/FichaController.php?acao=listar">
-                    Minhas fichas
-                </a>
-            </li>
+        <div class="mensagem mensagem--sucesso" role="status">
+            <p>Login realizado com sucesso.</p>
+        </div>
 
-            <li>
-                <a href="/Controllers/ProfissaoController.php?acao=listar">
-                    Minhas profissões
-                </a>
-            </li>
+        <nav aria-label="Menu principal">
+            <section class="painel-secao" aria-labelledby="menu-personagens">
+                <h2 class="painel-secao__titulo" id="menu-personagens">
+                    Personagens e profissões
+                </h2>
 
-            <li>
-                <a href="/Controllers/ProfissaoController.php?acao=publicas">
-                    Profissões públicas
-                </a>
-            </li>
+                <p class="painel-secao__descricao">
+                    Crie personagens ou consulte as profissões disponíveis.
+                </p>
 
-            <li>
-                <a href="/Controllers/VantagemController.php?acao=listar">
-                    Vantagens
-                </a>
-            </li>
+                <ul class="grade-menu">
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/FichaController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Minhas fichas</span>
+                            <span class="cartao-menu__descricao">
+                                Consulte e gerencie seus personagens.
+                            </span>
+                        </a>
+                    </li>
 
-            <li>
-                <a href="/Controllers/ArmaController.php?acao=listar">
-                    Armas
-                </a>
-            </li>
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/ProfissaoController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Minhas profissões</span>
+                            <span class="cartao-menu__descricao">
+                                Crie e organize suas profissões.
+                            </span>
+                        </a>
+                    </li>
 
-            <li>
-                <a href="/Controllers/VestimentaController.php?acao=listar">
-                    Vestimentas
-                </a>
-            </li>
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/ProfissaoController.php?acao=publicas">
+                            <span class="cartao-menu__titulo">Profissões públicas</span>
+                            <span class="cartao-menu__descricao">
+                                Conheça opções compartilhadas por outros usuários.
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
 
-            <li>
-                <a href="/Controllers/ItemController.php?acao=listar">
-                    Itens
-                </a>
-            </li>
+            <section class="painel-secao" aria-labelledby="menu-catalogos">
+                <h2 class="painel-secao__titulo" id="menu-catalogos">
+                    Catálogos
+                </h2>
 
-            <li>
-                <a href="/Controllers/MagiaController.php?acao=listar">
-                    Magias
-                </a>
-            </li>
+                <p class="painel-secao__descricao">
+                    Organize os recursos utilizados nas profissões e fichas.
+                </p>
 
-            <li>
-                <a href="/Controllers/CompanheiroAnimalController.php?acao=listar">
-                    Companheiros animais
-                </a>
-            </li>
-        </ul>
-    </nav>
+                <ul class="grade-menu">
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/VantagemController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Vantagens</span>
+                            <span class="cartao-menu__descricao">
+                                Cadastre benefícios normais, mágicos ou de companheiro.
+                            </span>
+                        </a>
+                    </li>
 
-    <form action="/Controllers/LogoutController.php" method="POST">
-        <button type="submit">Sair</button>
-    </form>
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/ArmaController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Armas</span>
+                            <span class="cartao-menu__descricao">
+                                Gerencie armas corporais e à distância.
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/VestimentaController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Vestimentas</span>
+                            <span class="cartao-menu__descricao">
+                                Organize armaduras e equipamentos de proteção.
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/ItemController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Itens</span>
+                            <span class="cartao-menu__descricao">
+                                Cadastre recursos para profissões e mochilas.
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/MagiaController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Magias</span>
+                            <span class="cartao-menu__descricao">
+                                Registre magias e seus elementos.
+                            </span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a class="cartao-menu" href="/Controllers/CompanheiroAnimalController.php?acao=listar">
+                            <span class="cartao-menu__titulo">Companheiros animais</span>
+                            <span class="cartao-menu__descricao">
+                                Gerencie os modelos de companheiros.
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </section>
+        </nav>
+    </main>
 </body>
 
 </html>

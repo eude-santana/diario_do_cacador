@@ -10,44 +10,79 @@ $erro = $_GET["erro"] ?? "";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
     <title>Login — Diário do Caçador</title>
 </head>
 
-<body>
-    <h1>Entrar</h1>
+<body class="pagina-autenticacao">
+    <main class="autenticacao" aria-labelledby="titulo-pagina">
+        <section class="cartao cartao--autenticacao">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">Diário do Caçador</p>
 
-    <?php if ($erro === "campos"): ?>
-        <p>Preencha todos os campos.</p>
-    <?php elseif ($erro === "email_invalido"): ?>
-        <p>Informe um e-mail válido.</p>
-    <?php elseif ($erro === "login_invalido"): ?>
-        <p>E-mail ou senha incorretos.</p>
-    <?php elseif ($erro === "usuario_inativo"): ?>
-        <p>Este usuário está inativo.</p>
-    <?php elseif ($erro === "consulta"): ?>
-        <p>Não foi possível realizar o login. Tente novamente mais tarde.</p>
-    <?php endif; ?>
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Entrar
+                </h1>
 
-    <form action="../../Controllers/LoginController.php" method="POST">
-        <div>
-            <label for="email">E-mail:</label>
+                <p class="cabecalho-pagina__descricao">
+                    Acesse suas fichas, profissões e registros de campanha.
+                </p>
+            </header>
 
-            <input type="email" id="email" name="email" maxlength="255" required>
-        </div>
+            <?php if ($erro === "campos"): ?>
+                <div class="mensagem mensagem--erro" role="alert">
+                    <p>Preencha todos os campos.</p>
+                </div>
+            <?php elseif ($erro === "email_invalido"): ?>
+                <div class="mensagem mensagem--erro" role="alert">
+                    <p>Informe um e-mail válido.</p>
+                </div>
+            <?php elseif ($erro === "login_invalido"): ?>
+                <div class="mensagem mensagem--erro" role="alert">
+                    <p>E-mail ou senha incorretos.</p>
+                </div>
+            <?php elseif ($erro === "usuario_inativo"): ?>
+                <div class="mensagem mensagem--erro" role="alert">
+                    <p>Este usuário está inativo.</p>
+                </div>
+            <?php elseif ($erro === "consulta"): ?>
+                <div class="mensagem mensagem--erro" role="alert">
+                    <p>Não foi possível realizar o login. Tente novamente mais tarde.</p>
+                </div>
+            <?php endif; ?>
 
-        <div>
-            <label for="senha">Senha:</label>
+            <form class="formulario" action="../../Controllers/LoginController.php" method="POST">
+                <div class="campo">
+                    <label class="campo__rotulo" for="email">E-mail</label>
 
-            <input type="password" id="senha" name="senha" required>
-        </div>
+                    <input class="campo__controle" type="email" id="email" name="email" maxlength="255"
+                        autocomplete="email" required>
+                </div>
 
-        <button type="submit">Entrar</button>
-    </form>
+                <div class="campo">
+                    <label class="campo__rotulo" for="senha">Senha</label>
 
-    <p>
-        Ainda não possui uma conta?
-        <a href="cadastro.php">Cadastre-se</a>
-    </p>
+                    <input class="campo__controle" type="password" id="senha" name="senha"
+                        autocomplete="current-password" required>
+                </div>
+
+                <button class="botao botao--primario botao--largura-total" type="submit">
+                    Entrar
+                </button>
+            </form>
+
+            <p class="autenticacao__alternativa">
+                Ainda não possui uma conta?
+                <a href="cadastro.php">Cadastre-se</a>
+            </p>
+        </section>
+    </main>
 </body>
 
 </html>

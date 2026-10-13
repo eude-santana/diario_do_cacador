@@ -20,85 +20,115 @@ $mensagemErro = $mensagensErro[$codigoErro] ?? "";
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Profissões públicas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
+    <title>Profissões públicas — Diário do Caçador</title>
 </head>
 
 <body>
-    <main>
-        <h1>Profissões públicas</h1>
+    <main class="pagina pagina-listagem" aria-labelledby="titulo-pagina">
+        <header class="cabecalho-com-acoes">
+            <div class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Arquivo de profissões
+                </p>
 
-        <p>
-            Estas profissões podem ser consultadas, mas somente seus
-            autores podem editá-las ou utilizá-las em suas fichas.
-        </p>
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Profissões públicas
+                </h1>
+
+                <p class="cabecalho-pagina__descricao">
+                    Consulte profissões compartilhadas por outros autores.
+                    Somente seus autores podem editá-las ou utilizá-las
+                    em suas fichas.
+                </p>
+            </div>
+
+            <nav class="acoes-pagina" aria-label="Ações da página">
+                <a class="botao botao--primario" href="/Controllers/ProfissaoController.php?acao=listar">
+                    Minhas profissões
+                </a>
+
+                <a class="botao botao--secundario" href="/Views/Usuario/painel.php">
+                    Voltar ao painel
+                </a>
+            </nav>
+        </header>
 
         <?php if ($mensagemErro !== ""): ?>
-            <p>
-                <?= htmlspecialchars(
-                    $mensagemErro,
-                    ENT_QUOTES,
-                    "UTF-8"
-                ) ?>
-            </p>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    <?= htmlspecialchars(
+                        $mensagemErro,
+                        ENT_QUOTES,
+                        "UTF-8"
+                    ) ?>
+                </p>
+            </div>
         <?php endif; ?>
 
-        <nav>
-            <a href="/Controllers/ProfissaoController.php?acao=listar">
-                Minhas profissões
-            </a>
-
-            <a href="/Views/Usuario/painel.php">
-                Voltar ao painel
-            </a>
-        </nav>
-
         <?php if (empty($profissoesPublicas)): ?>
-            <p>
-                Nenhuma profissão pública disponível.
-            </p>
+            <div class="estado-vazio">
+                <p>Nenhuma profissão pública disponível.</p>
+
+                <p>
+                    Quando uma profissão for compartilhada, ela
+                    aparecerá neste arquivo para consulta.
+                </p>
+            </div>
         <?php else: ?>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Nome</th>
-                        <th>Autor</th>
-                        <th>Descrição</th>
-                        <th>PV máximo</th>
-                        <th>Ação</th>
-                    </tr>
-                </thead>
+            <section class="grade-profissoes" aria-label="Profissões públicas disponíveis">
+                <?php foreach (
+                    $profissoesPublicas as $profissao
+                ): ?>
+                    <?php
+                    $idProfissao =
+                        (int) $profissao["id_profissao"];
 
-                <tbody>
-                    <?php foreach (
-                        $profissoesPublicas as $profissao
-                    ): ?>
-                        <?php
-                        $idProfissao =
-                            (int) $profissao["id_profissao"];
+                    $descricao =
+                        $profissao["descricao"] ?? "";
+                    ?>
 
-                        $descricao =
-                            $profissao["descricao"] ?? "";
-                        ?>
+                    <a class="cartao-menu cartao-profissao"
+                        href="/Controllers/ProfissaoController.php?acao=visualizar&id=<?= $idProfissao ?>">
+                        <p class="cartao-profissao__marca">
+                            Profissão pública
+                        </p>
 
-                        <tr>
-                            <td>
-                                <?= htmlspecialchars(
-                                    $profissao["nome"],
-                                    ENT_QUOTES,
-                                    "UTF-8"
-                                ) ?>
-                            </td>
+                        <h2 class="cartao-menu__titulo cartao-profissao__titulo">
+                            <?= htmlspecialchars(
+                                $profissao["nome"],
+                                ENT_QUOTES,
+                                "UTF-8"
+                            ) ?>
+                        </h2>
 
-                            <td>
+                        <div class="cartao-profissao__dados">
+                            <p>
+                                <strong>Autor:</strong>
                                 <?= htmlspecialchars(
                                     $profissao["nome_autor"],
                                     ENT_QUOTES,
                                     "UTF-8"
                                 ) ?>
-                            </td>
+                            </p>
 
-                            <td>
-                                <?php if ($descricao !== ""): ?>
+                            <p>
+                                <strong>PV máximo:</strong>
+                                <?= (int) $profissao["pv_maximo"] ?>
+                            </p>
+                        </div>
+
+                        <div class="cartao-menu__descricao cartao-profissao__descricao">
+                            <?php if ($descricao !== ""): ?>
+                                <p>
                                     <?= nl2br(
                                         htmlspecialchars(
                                             $descricao,
@@ -106,24 +136,14 @@ $mensagemErro = $mensagensErro[$codigoErro] ?? "";
                                             "UTF-8"
                                         )
                                     ) ?>
-                                <?php else: ?>
-                                    Sem descrição
-                                <?php endif; ?>
-                            </td>
-
-                            <td>
-                                <?= (int) $profissao["pv_maximo"] ?>
-                            </td>
-
-                            <td>
-                                <a href="/Controllers/ProfissaoController.php?acao=visualizar&id=<?= $idProfissao ?>">
-                                    Visualizar
-                                </a>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+                                </p>
+                            <?php else: ?>
+                                <p>Sem descrição.</p>
+                            <?php endif; ?>
+                        </div>
+                    </a>
+                <?php endforeach; ?>
+            </section>
         <?php endif; ?>
     </main>
 </body>

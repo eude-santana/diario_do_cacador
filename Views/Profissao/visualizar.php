@@ -52,348 +52,462 @@ function escaparProfissaoPublica($valor): string
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Visualizar profissão</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
+    <title>Visualizar profissão — Diário do Caçador</title>
 </head>
 
 <body>
-    <main>
-        <h1>
-            <?= escaparProfissaoPublica(
-                $profissao["nome"] ?? ""
-            ) ?>
-        </h1>
-
-        <p>
-            <strong>Autor:</strong>
-
-            <?= escaparProfissaoPublica(
-                $profissao["nome_autor"] ?? ""
-            ) ?>
-        </p>
-
-        <p>
-            <strong>PV máximo:</strong>
-            <?= (int) ($profissao["pv_maximo"] ?? 0) ?>
-        </p>
-
-        <section>
-            <h2>Descrição</h2>
-
-            <?php if (($profissao["descricao"] ?? "") !== ""): ?>
-                <p>
-                    <?= nl2br(
-                        escaparProfissaoPublica(
-                            $profissao["descricao"]
-                        )
-                    ) ?>
+    <main class="pagina pagina-detalhes" aria-labelledby="titulo-pagina">
+        <div class="cabecalho-com-acoes">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Registro público
                 </p>
-            <?php else: ?>
-                <p>Sem descrição.</p>
-            <?php endif; ?>
+
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    <?= escaparProfissaoPublica(
+                        $profissao["nome"] ?? ""
+                    ) ?>
+                </h1>
+
+                <p class="cabecalho-pagina__descricao">
+                    Consulte as características, vantagens e recursos
+                    iniciais desta profissão.
+                </p>
+            </header>
+
+            <nav class="acoes-pagina pagina-detalhes__navegacao" aria-label="Navegação da profissão">
+                <a class="botao botao--secundario" href="/Controllers/ProfissaoController.php?acao=publicas">
+                    Voltar às profissões públicas
+                </a>
+            </nav>
+        </div>
+
+        <dl class="resumo-profissao" aria-label="Resumo da profissão">
+            <div class="resumo-profissao__item">
+                <dt class="resumo-profissao__rotulo">
+                    Autor
+                </dt>
+
+                <dd class="resumo-profissao__valor">
+                    <?= escaparProfissaoPublica(
+                        $profissao["nome_autor"] ?? ""
+                    ) ?>
+                </dd>
+            </div>
+
+            <div class="resumo-profissao__item">
+                <dt class="resumo-profissao__rotulo">
+                    PV máximo
+                </dt>
+
+                <dd class="resumo-profissao__valor">
+                    <?= (int) ($profissao["pv_maximo"] ?? 0) ?>
+                </dd>
+            </div>
+        </dl>
+
+        <section class="secao-profissao" aria-labelledby="titulo-descricao">
+            <h2 class="secao-profissao__titulo" id="titulo-descricao">
+                Descrição
+            </h2>
+
+            <div class="secao-profissao__texto">
+                <?php if (
+                    ($profissao["descricao"] ?? "") !== ""
+                ): ?>
+                    <p>
+                        <?= nl2br(
+                            escaparProfissaoPublica(
+                                $profissao["descricao"]
+                            )
+                        ) ?>
+                    </p>
+                <?php else: ?>
+                    <p class="secao-profissao__vazio">
+                        Sem descrição.
+                    </p>
+                <?php endif; ?>
+            </div>
         </section>
 
-        <section>
-            <h2>Vantagens</h2>
+        <section class="secao-profissao" aria-labelledby="titulo-vantagens">
+            <h2 class="secao-profissao__titulo" id="titulo-vantagens">
+                Vantagens
+            </h2>
 
             <?php if (empty($vantagens)): ?>
-                <p>Nenhuma vantagem cadastrada.</p>
+                <p class="secao-profissao__vazio">
+                    Nenhuma vantagem cadastrada.
+                </p>
             <?php else: ?>
-                <?php foreach ($vantagens as $vantagem): ?>
-                    <?php
-                    $tipoVantagem =
-                        $vantagem["tipo"] ?? "NORMAL";
+                <div class="grade-vantagens">
+                    <?php foreach ($vantagens as $vantagem): ?>
+                        <?php
+                        $tipoVantagem =
+                            $vantagem["tipo"] ?? "NORMAL";
 
-                    $nomeTipoVantagem =
-                        $tiposVantagem[$tipoVantagem]
-                        ?? "Normal";
-                    ?>
+                        $nomeTipoVantagem =
+                            $tiposVantagem[$tipoVantagem]
+                            ?? "Normal";
+                        ?>
 
-                    <article>
-                        <h3>
-                            Slot <?= (int) $vantagem["slot"] ?>:
+                        <article class="registro-detalhe">
+                            <p class="registro-detalhe__marca">
+                                Vantagem do slot
+                                <?= (int) $vantagem["slot"] ?>
+                            </p>
 
-                            <?= escaparProfissaoPublica(
-                                $vantagem["nome"]
-                            ) ?>
-                        </h3>
+                            <h3 class="registro-detalhe__titulo">
+                                <?= escaparProfissaoPublica(
+                                    $vantagem["nome"]
+                                ) ?>
+                            </h3>
 
-                        <p>
-                            <strong>Tipo:</strong>
-                            <?= escaparProfissaoPublica(
-                                $nomeTipoVantagem
-                            ) ?>
-                        </p>
+                            <p class="registro-detalhe__informacoes">
+                                <strong>Tipo:</strong>
 
-                        <?php if (
-                            ($vantagem["descricao"] ?? "") !== ""
-                        ): ?>
-                            <p>
-                                <?= nl2br(
-                                    escaparProfissaoPublica(
-                                        $vantagem["descricao"]
-                                    )
+                                <?= escaparProfissaoPublica(
+                                    $nomeTipoVantagem
                                 ) ?>
                             </p>
-                        <?php endif; ?>
 
-                        <?php if (!empty($vantagem["magias"])): ?>
-                            <h4>Magias disponíveis</h4>
+                            <?php if (
+                                ($vantagem["descricao"] ?? "") !== ""
+                            ): ?>
+                                <div class="registro-detalhe__descricao">
+                                    <p>
+                                        <?= nl2br(
+                                            escaparProfissaoPublica(
+                                                $vantagem["descricao"]
+                                            )
+                                        ) ?>
+                                    </p>
+                                </div>
+                            <?php endif; ?>
 
-                            <ul>
-                                <?php foreach (
-                                    $vantagem["magias"] as $magia
-                                ): ?>
-                                    <li>
-                                        <strong>
-                                            <?= escaparProfissaoPublica(
-                                                $magia["nome"]
-                                            ) ?>
-                                        </strong>
+                            <?php if (
+                                !empty($vantagem["magias"])
+                            ): ?>
+                                <div class="registro-detalhe__subsecao">
+                                    <h4 class="registro-detalhe__subtitulo">
+                                        Magias disponíveis
+                                    </h4>
 
-                                        —
+                                    <ul class="registro-detalhe__sublista">
+                                        <?php foreach (
+                                            $vantagem["magias"] as $magia
+                                        ): ?>
+                                            <li>
+                                                <strong>
+                                                    <?= escaparProfissaoPublica(
+                                                        $magia["nome"]
+                                                    ) ?>
+                                                </strong>
+
+                                                —
+
+                                                <?= escaparProfissaoPublica(
+                                                    $magia["elemento"]
+                                                ) ?>
+
+                                                <?php if (
+                                                    ($magia["descricao"] ?? "")
+                                                    !== ""
+                                                ): ?>
+                                                    <p>
+                                                        <?= nl2br(
+                                                            escaparProfissaoPublica(
+                                                                $magia[
+                                                                    "descricao"
+                                                                ]
+                                                            )
+                                                        ) ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if (
+                                !empty($vantagem["companheiros"])
+                            ): ?>
+                                <div class="registro-detalhe__subsecao">
+                                    <h4 class="registro-detalhe__subtitulo">
+                                        Companheiros disponíveis
+                                    </h4>
+
+                                    <ul class="registro-detalhe__sublista">
+                                        <?php foreach (
+                                            $vantagem["companheiros"] as
+                                            $companheiro
+                                        ): ?>
+                                            <li>
+                                                <strong>
+                                                    <?= escaparProfissaoPublica(
+                                                        $companheiro["tipo"]
+                                                    ) ?>
+                                                </strong>
+
+                                                — PV máximo:
+                                                <?= (int) $companheiro[
+                                                    "pv_maximo"
+                                                ] ?>
+
+                                                <?php if (
+                                                    ($companheiro["dano"] ?? "")
+                                                    !== ""
+                                                ): ?>
+                                                    — Dano:
+
+                                                    <?= escaparProfissaoPublica(
+                                                        $companheiro["dano"]
+                                                    ) ?>
+                                                <?php endif; ?>
+
+                                                <?php if (
+                                                    ($companheiro[
+                                                        "descricao"
+                                                    ] ?? "") !== ""
+                                                ): ?>
+                                                    <p>
+                                                        <?= nl2br(
+                                                            escaparProfissaoPublica(
+                                                                $companheiro[
+                                                                    "descricao"
+                                                                ]
+                                                            )
+                                                        ) ?>
+                                                    </p>
+                                                <?php endif; ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </section>
+
+        <div class="grade-recursos">
+            <section class="secao-profissao secao-profissao--recurso" aria-labelledby="titulo-armas">
+                <h2 class="secao-profissao__titulo" id="titulo-armas">
+                    Armas iniciais
+                </h2>
+
+                <?php if (empty($armas)): ?>
+                    <p class="secao-profissao__vazio">
+                        Nenhuma arma inicial.
+                    </p>
+                <?php else: ?>
+                    <ul class="lista-recursos">
+                        <?php foreach ($armas as $arma): ?>
+                            <?php
+                            $nomeTipoArma =
+                                $tiposArma[$arma["tipo"]]
+                                ?? $arma["tipo"];
+                            ?>
+
+                            <li class="lista-recursos__item">
+                                <h3 class="lista-recursos__titulo">
+                                    Slot <?= (int) $arma["slot"] ?>:
+
+                                    <?= escaparProfissaoPublica(
+                                        $arma["nome"]
+                                    ) ?>
+                                </h3>
+
+                                <div class="lista-recursos__dados">
+                                    <span>
+                                        <strong>Tipo:</strong>
 
                                         <?= escaparProfissaoPublica(
-                                            $magia["elemento"]
+                                            $nomeTipoArma
                                         ) ?>
+                                    </span>
 
-                                        <?php if (
-                                            ($magia["descricao"] ?? "")
-                                            !== ""
-                                        ): ?>
-                                            <p>
-                                                <?= nl2br(
-                                                    escaparProfissaoPublica(
-                                                        $magia["descricao"]
-                                                    )
-                                                ) ?>
-                                            </p>
-                                        <?php endif; ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php endif; ?>
+                                    <span>
+                                        <strong>Mãos:</strong>
+                                        <?= (int) $arma["maos"] ?>
+                                    </span>
 
-                        <?php if (
-                            !empty($vantagem["companheiros"])
-                        ): ?>
-                            <h4>Companheiros disponíveis</h4>
+                                    <span>
+                                        <strong>Dano:</strong>
 
-                            <ul>
-                                <?php foreach (
-                                    $vantagem["companheiros"] as
-                                    $companheiro
+                                        <?= escaparProfissaoPublica(
+                                            $arma["dano"]
+                                        ) ?>
+                                    </span>
+                                </div>
+
+                                <?php if (
+                                    ($arma["especial"] ?? "") !== ""
                                 ): ?>
-                                    <li>
-                                        <strong>
-                                            <?= escaparProfissaoPublica(
-                                                $companheiro["tipo"]
-                                            ) ?>
-                                        </strong>
+                                    <p class="lista-recursos__descricao">
+                                        <?= nl2br(
+                                            escaparProfissaoPublica(
+                                                $arma["especial"]
+                                            )
+                                        ) ?>
+                                    </p>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
 
-                                        — PV máximo:
-                                        <?= (int) $companheiro[
-                                            "pv_maximo"
+            <section class="secao-profissao secao-profissao--recurso" aria-labelledby="titulo-vestimentas">
+                <h2 class="secao-profissao__titulo" id="titulo-vestimentas">
+                    Vestimentas iniciais
+                </h2>
+
+                <?php if (empty($vestimentas)): ?>
+                    <p class="secao-profissao__vazio">
+                        Nenhuma vestimenta inicial.
+                    </p>
+                <?php else: ?>
+                    <ul class="lista-recursos">
+                        <?php foreach ($vestimentas as $vestimenta): ?>
+                            <?php
+                            $nomeTipoVestimenta =
+                                $tiposVestimenta[
+                                    $vestimenta["tipo_slot"]
+                                ] ?? $vestimenta["tipo_slot"];
+                            ?>
+
+                            <li class="lista-recursos__item">
+                                <h3 class="lista-recursos__titulo">
+                                    <?= escaparProfissaoPublica(
+                                        $nomeTipoVestimenta
+                                    ) ?>:
+
+                                    <?= escaparProfissaoPublica(
+                                        $vestimenta["nome"]
+                                    ) ?>
+                                </h3>
+
+                                <div class="lista-recursos__dados">
+                                    <span>
+                                        <strong>PP máximo:</strong>
+
+                                        <?= (int) $vestimenta[
+                                            "pontos_protecao_maximo"
                                         ] ?>
+                                    </span>
 
-                                        <?php if (
-                                            ($companheiro["dano"] ?? "")
-                                            !== ""
-                                        ): ?>
-                                            — Dano:
+                                    <?php if (
+                                        ($vestimenta["dano"] ?? "") !== ""
+                                    ): ?>
+                                        <span>
+                                            <strong>Dano:</strong>
+
                                             <?= escaparProfissaoPublica(
-                                                $companheiro["dano"]
+                                                $vestimenta["dano"]
                                             ) ?>
-                                        <?php endif; ?>
+                                        </span>
+                                    <?php endif; ?>
 
-                                        <?php if (
-                                            ($companheiro["descricao"] ?? "")
-                                            !== ""
-                                        ): ?>
-                                            <p>
-                                                <?= nl2br(
-                                                    escaparProfissaoPublica(
-                                                        $companheiro[
-                                                            "descricao"
-                                                        ]
-                                                    )
-                                                ) ?>
-                                            </p>
-                                        <?php endif; ?>
-                                    </li>
-                                <?php endforeach; ?>
-                            </ul>
-                        <?php endif; ?>
-                    </article>
-                <?php endforeach; ?>
-            <?php endif; ?>
-        </section>
+                                    <?php if (
+                                        ($vestimenta["elemento"] ?? "")
+                                        !== ""
+                                    ): ?>
+                                        <span>
+                                            <strong>Elemento:</strong>
 
-        <section>
-            <h2>Armas iniciais</h2>
+                                            <?= escaparProfissaoPublica(
+                                                $vestimenta["elemento"]
+                                            ) ?>
+                                        </span>
+                                    <?php endif; ?>
+                                </div>
 
-            <?php if (empty($armas)): ?>
-                <p>Nenhuma arma inicial.</p>
-            <?php else: ?>
-                <ul>
-                    <?php foreach ($armas as $arma): ?>
-                        <?php
-                        $nomeTipoArma =
-                            $tiposArma[$arma["tipo"]] ?? $arma["tipo"];
-                        ?>
+                                <?php if (
+                                    ($vestimenta["especial"] ?? "") !== ""
+                                ): ?>
+                                    <p class="lista-recursos__descricao">
+                                        <?= nl2br(
+                                            escaparProfissaoPublica(
+                                                $vestimenta["especial"]
+                                            )
+                                        ) ?>
+                                    </p>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
 
-                        <li>
-                            <strong>
-                                Slot <?= (int) $arma["slot"] ?>:
+            <section class="secao-profissao secao-profissao--recurso" aria-labelledby="titulo-itens">
+                <h2 class="secao-profissao__titulo" id="titulo-itens">
+                    Itens iniciais
+                </h2>
 
-                                <?= escaparProfissaoPublica(
-                                    $arma["nome"]
-                                ) ?>
-                            </strong>
+                <?php if (empty($itens)): ?>
+                    <p class="secao-profissao__vazio">
+                        Nenhum item inicial.
+                    </p>
+                <?php else: ?>
+                    <ul class="lista-recursos">
+                        <?php foreach ($itens as $item): ?>
+                            <?php
+                            $nomeTipoItem =
+                                $tiposItem[$item["tipo"]]
+                                ?? $item["tipo"];
+                            ?>
 
-                            — <?= escaparProfissaoPublica(
-                                $nomeTipoArma
-                            ) ?>
-
-                            — Mãos: <?= (int) $arma["maos"] ?>
-
-                            — Dano:
-                            <?= escaparProfissaoPublica(
-                                $arma["dano"]
-                            ) ?>
-
-                            <?php if (
-                                ($arma["especial"] ?? "") !== ""
-                            ): ?>
-                                <p>
-                                    <?= nl2br(
-                                        escaparProfissaoPublica(
-                                            $arma["especial"]
-                                        )
+                            <li class="lista-recursos__item">
+                                <h3 class="lista-recursos__titulo">
+                                    <?= escaparProfissaoPublica(
+                                        $item["nome"]
                                     ) ?>
-                                </p>
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
-        </section>
+                                </h3>
 
-        <section>
-            <h2>Vestimentas iniciais</h2>
+                                <div class="lista-recursos__dados">
+                                    <span>
+                                        <strong>Quantidade:</strong>
+                                        <?= (int) $item["quantidade"] ?>
+                                    </span>
 
-            <?php if (empty($vestimentas)): ?>
-                <p>Nenhuma vestimenta inicial.</p>
-            <?php else: ?>
-                <ul>
-                    <?php foreach ($vestimentas as $vestimenta): ?>
-                        <?php
-                        $nomeTipoVestimenta =
-                            $tiposVestimenta[
-                                $vestimenta["tipo_slot"]
-                            ] ?? $vestimenta["tipo_slot"];
-                        ?>
+                                    <span>
+                                        <strong>Tipo:</strong>
 
-                        <li>
-                            <strong>
-                                <?= escaparProfissaoPublica(
-                                    $nomeTipoVestimenta
-                                ) ?>:
+                                        <?= escaparProfissaoPublica(
+                                            $nomeTipoItem
+                                        ) ?>
+                                    </span>
+                                </div>
 
-                                <?= escaparProfissaoPublica(
-                                    $vestimenta["nome"]
-                                ) ?>
-                            </strong>
-
-                            — PP máximo:
-                            <?= (int) $vestimenta[
-                                "pontos_protecao_maximo"
-                            ] ?>
-
-                            <?php if (
-                                ($vestimenta["dano"] ?? "") !== ""
-                            ): ?>
-                                — Dano:
-                                <?= escaparProfissaoPublica(
-                                    $vestimenta["dano"]
-                                ) ?>
-                            <?php endif; ?>
-
-                            <?php if (
-                                ($vestimenta["elemento"] ?? "") !== ""
-                            ): ?>
-                                — Elemento:
-                                <?= escaparProfissaoPublica(
-                                    $vestimenta["elemento"]
-                                ) ?>
-                            <?php endif; ?>
-
-                            <?php if (
-                                ($vestimenta["especial"] ?? "") !== ""
-                            ): ?>
-                                <p>
-                                    <?= nl2br(
-                                        escaparProfissaoPublica(
-                                            $vestimenta["especial"]
-                                        )
-                                    ) ?>
-                                </p>
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
-        </section>
-
-        <section>
-            <h2>Itens iniciais</h2>
-
-            <?php if (empty($itens)): ?>
-                <p>Nenhum item inicial.</p>
-            <?php else: ?>
-                <ul>
-                    <?php foreach ($itens as $item): ?>
-                        <?php
-                        $nomeTipoItem =
-                            $tiposItem[$item["tipo"]]
-                            ?? $item["tipo"];
-                        ?>
-
-                        <li>
-                            <strong>
-                                <?= escaparProfissaoPublica(
-                                    $item["nome"]
-                                ) ?>
-                            </strong>
-
-                            — Quantidade:
-                            <?= (int) $item["quantidade"] ?>
-
-                            — <?= escaparProfissaoPublica(
-                                $nomeTipoItem
-                            ) ?>
-
-                            <?php if (
-                                ($item["descricao"] ?? "") !== ""
-                            ): ?>
-                                <p>
-                                    <?= nl2br(
-                                        escaparProfissaoPublica(
-                                            $item["descricao"]
-                                        )
-                                    ) ?>
-                                </p>
-                            <?php endif; ?>
-                        </li>
-                    <?php endforeach; ?>
-                </ul>
-            <?php endif; ?>
-        </section>
-
-        <p>
-            <a href="/Controllers/ProfissaoController.php?acao=publicas">
-                Voltar às profissões públicas
-            </a>
-        </p>
+                                <?php if (
+                                    ($item["descricao"] ?? "") !== ""
+                                ): ?>
+                                    <p class="lista-recursos__descricao">
+                                        <?= nl2br(
+                                            escaparProfissaoPublica(
+                                                $item["descricao"]
+                                            )
+                                        ) ?>
+                                    </p>
+                                <?php endif; ?>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                <?php endif; ?>
+            </section>
+        </div>
     </main>
 </body>
 
