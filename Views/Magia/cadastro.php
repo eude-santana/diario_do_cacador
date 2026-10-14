@@ -16,64 +16,112 @@ $sucesso = $_GET["sucesso"] ?? "";
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../../Assets/css/style.css">
+
     <title>Cadastrar magia — Diário do Caçador</title>
 </head>
 
 <body>
-    <h1>Cadastrar magia</h1>
+    <main class="pagina pagina-formulario" aria-labelledby="titulo-pagina">
+        <div class="cabecalho-com-acoes">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Registro arcano
+                </p>
 
-    <?php if ($sucesso === "1"): ?>
-        <p>Magia cadastrada com sucesso!</p>
-    <?php endif; ?>
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Cadastrar magia
+                </h1>
 
-    <?php if ($erro === "campos"): ?>
-        <p>Preencha o nome e o elemento da magia.</p>
+                <p class="cabecalho-pagina__descricao">
+                    Registre uma magia que poderá fazer parte das habilidades
+                    de um personagem.
+                </p>
+            </header>
 
-    <?php elseif ($erro === "nome_longo"): ?>
-        <p>O nome deve possuir no máximo 100 caracteres.</p>
+            <nav class="acoes-pagina" aria-label="Ações da página">
+                <a class="botao botao--secundario" href="/Controllers/MagiaController.php?acao=listar">
+                    Ver minhas magias
+                </a>
 
-    <?php elseif ($erro === "elemento_longo"): ?>
-        <p>O elemento deve possuir no máximo 50 caracteres.</p>
-
-    <?php elseif ($erro === "cadastro"): ?>
-        <p>Não foi possível cadastrar a magia.</p>
-    <?php endif; ?>
-
-    <form action="../../Controllers/MagiaController.php" method="POST">
-        <input type="hidden" name="acao" value="cadastrar">
-
-        <div>
-            <label for="nome">Nome:</label>
-
-            <input type="text" id="nome" name="nome" maxlength="100" required>
+                <a class="botao botao--secundario" href="../Usuario/painel.php">
+                    Voltar ao painel
+                </a>
+            </nav>
         </div>
 
-        <div>
-            <label for="elemento">Elemento:</label>
+        <?php if ($sucesso === "1"): ?>
+            <div class="mensagem mensagem--sucesso" role="status">
+                <p>Magia cadastrada com sucesso!</p>
+            </div>
+        <?php endif; ?>
 
-            <input type="text" id="elemento" name="elemento" maxlength="50" placeholder="Exemplo: Fogo" required>
-        </div>
+        <?php if ($erro === "campos"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>Preencha o nome e o elemento da magia.</p>
+            </div>
+        <?php elseif ($erro === "nome_longo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>O nome deve possuir no máximo 100 caracteres.</p>
+            </div>
+        <?php elseif ($erro === "elemento_longo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>O elemento deve possuir no máximo 50 caracteres.</p>
+            </div>
+        <?php elseif ($erro === "cadastro"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>Não foi possível cadastrar a magia.</p>
+            </div>
+        <?php endif; ?>
 
-        <div>
-            <label for="descricao">Descrição:</label>
+        <form class="formulario formulario-registro" action="../../Controllers/MagiaController.php" method="POST">
+            <input type="hidden" name="acao" value="cadastrar">
 
-            <textarea id="descricao" name="descricao" rows="5" cols="40"></textarea>
-        </div>
+            <div class="campo">
+                <label class="campo__rotulo" for="nome">
+                    Nome
+                </label>
 
-        <button type="submit">Cadastrar</button>
-    </form>
+                <input class="campo__controle" type="text" id="nome" name="nome" maxlength="100" required>
+            </div>
 
-    <p>
-        <a href="/Controllers/MagiaController.php?acao=listar">
-            Ver minhas magias
-        </a>
-    </p>
+            <div class="campo">
+                <label class="campo__rotulo" for="elemento">
+                    Elemento
+                </label>
 
-    <p>
-        <a href="../Usuario/painel.php">
-            Voltar ao painel
-        </a>
-    </p>
+                <input class="campo__controle" type="text" id="elemento" name="elemento" maxlength="50"
+                    placeholder="Exemplo: Fogo" required>
+            </div>
+
+            <div class="campo">
+                <label class="campo__rotulo" for="descricao">
+                    Descrição
+                </label>
+
+                <small class="campo__ajuda">
+                    Campo opcional para explicar os efeitos e características
+                    da magia.
+                </small>
+
+                <textarea class="campo__controle" id="descricao" name="descricao" rows="5"></textarea>
+            </div>
+
+            <div class="formulario__acoes">
+                <button class="botao botao--primario" type="submit">
+                    Cadastrar magia
+                </button>
+            </div>
+        </form>
+    </main>
 </body>
 
 </html>

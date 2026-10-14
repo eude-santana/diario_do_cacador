@@ -17,104 +17,178 @@ $sucesso = $_GET["sucesso"] ?? "";
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
     <title>
         Cadastrar vestimenta — Diário do Caçador
     </title>
 </head>
 
 <body>
-    <h1>Cadastrar vestimenta</h1>
+    <main class="pagina pagina-formulario" aria-labelledby="titulo-pagina">
+        <div class="cabecalho-com-acoes
+                   cabecalho-com-acoes--muitas-acoes">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Equipamentos de proteção
+                </p>
 
-    <?php if ($sucesso === "1"): ?>
-        <p>Vestimenta cadastrada com sucesso!</p>
-    <?php endif; ?>
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Cadastrar vestimenta
+                </h1>
 
-    <?php if ($erro === "campos"): ?>
-        <p>
-            Preencha o nome e informe uma proteção máxima válida.
-        </p>
+                <p class="cabecalho-pagina__descricao">
+                    Registre armaduras e outros equipamentos
+                    utilizados pelos personagens.
+                </p>
+            </header>
 
-    <?php elseif ($erro === "nome_longo"): ?>
-        <p>O nome deve possuir no máximo 100 caracteres.</p>
+            <nav class="acoes-pagina" aria-label="Ações da página">
+                <a class="botao botao--secundario" href="/Controllers/VestimentaController.php?acao=listar">
+                    Minhas vestimentas
+                </a>
 
-    <?php elseif ($erro === "tipo"): ?>
-        <p>Selecione um tipo de vestimenta válido.</p>
-
-    <?php elseif ($erro === "dano_longo"): ?>
-        <p>O dano deve possuir no máximo 50 caracteres.</p>
-
-    <?php elseif ($erro === "elemento_longo"): ?>
-        <p>O elemento deve possuir no máximo 50 caracteres.</p>
-
-    <?php elseif ($erro === "cadastro"): ?>
-        <p>Não foi possível cadastrar a vestimenta.</p>
-    <?php endif; ?>
-
-    <form action="../../Controllers/VestimentaController.php" method="POST">
-        <input type="hidden" name="acao" value="cadastrar">
-
-        <div>
-            <label for="nome">Nome:</label>
-
-            <input type="text" id="nome" name="nome" maxlength="100" required>
+                <a class="botao botao--secundario" href="../Usuario/painel.php">
+                    Voltar ao painel
+                </a>
+            </nav>
         </div>
 
-        <div>
-            <label for="tipo">Tipo:</label>
+        <?php if ($sucesso === "1"): ?>
+            <div class="mensagem mensagem--sucesso" role="status">
+                <p>Vestimenta cadastrada com sucesso!</p>
+            </div>
+        <?php endif; ?>
 
-            <select id="tipo" name="tipo" required>
-                <option value="">Selecione</option>
-                <option value="ARMADURA">Armadura</option>
-                <option value="ELMO">Elmo</option>
-                <option value="BRACELETES">Braceletes</option>
-                <option value="BOTAS">Botas</option>
-                <option value="ESCUDO">Escudo</option>
-            </select>
-        </div>
+        <?php if ($erro === "campos"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    Preencha o nome e informe uma proteção
+                    máxima válida.
+                </p>
+            </div>
 
-        <div>
-            <label for="pontos_protecao_maximo">
-                Pontos de proteção máximos:
-            </label>
+        <?php elseif ($erro === "nome_longo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    O nome deve possuir no máximo 100 caracteres.
+                </p>
+            </div>
 
-            <input type="number" id="pontos_protecao_maximo" name="pontos_protecao_maximo" min="1" required>
-        </div>
+        <?php elseif ($erro === "tipo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    Selecione um tipo de vestimenta válido.
+                </p>
+            </div>
 
-        <div>
-            <label for="dano">Dano:</label>
+        <?php elseif ($erro === "dano_longo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    O dano deve possuir no máximo 50 caracteres.
+                </p>
+            </div>
 
-            <input type="text" id="dano" name="dano" maxlength="50" placeholder="Preencha somente quando aplicável">
-        </div>
+        <?php elseif ($erro === "elemento_longo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    O elemento deve possuir no máximo
+                    50 caracteres.
+                </p>
+            </div>
 
-        <div>
-            <label for="elemento">Elemento:</label>
+        <?php elseif ($erro === "cadastro"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    Não foi possível cadastrar a vestimenta.
+                </p>
+            </div>
+        <?php endif; ?>
 
-            <input type="text" id="elemento" name="elemento" maxlength="50"
-                placeholder="Preencha somente quando aplicável">
-        </div>
+        <form class="formulario formulario-registro" action="../../Controllers/VestimentaController.php" method="POST">
+            <input type="hidden" name="acao" value="cadastrar">
 
-        <div>
-            <label for="especial">Especial:</label>
+            <div class="campo">
+                <label class="campo__rotulo" for="nome">
+                    Nome:
+                </label>
 
-            <textarea id="especial" name="especial" rows="5" cols="40"></textarea>
-        </div>
+                <input class="campo__controle" type="text" id="nome" name="nome" maxlength="100" required>
+            </div>
 
-        <button type="submit">
-            Cadastrar
-        </button>
-    </form>
+            <div class="formulario__linha
+                       formulario__linha--duas-colunas">
+                <div class="campo">
+                    <label class="campo__rotulo" for="tipo">
+                        Tipo:
+                    </label>
 
-    <p>
-        <a href="/Controllers/VestimentaController.php?acao=listar">
-            Ver minhas vestimentas
-        </a>
-    </p>
+                    <select class="campo__controle" id="tipo" name="tipo" required>
+                        <option value="">Selecione</option>
+                        <option value="ARMADURA">Armadura</option>
+                        <option value="ELMO">Elmo</option>
+                        <option value="BRACELETES">
+                            Braceletes
+                        </option>
+                        <option value="BOTAS">Botas</option>
+                        <option value="ESCUDO">Escudo</option>
+                    </select>
+                </div>
 
-    <p>
-        <a href="../Usuario/painel.php">
-            Voltar ao painel
-        </a>
-    </p>
+                <div class="campo">
+                    <label class="campo__rotulo" for="pontos_protecao_maximo">
+                        Pontos de proteção máximos:
+                    </label>
+
+                    <input class="campo__controle" type="number" id="pontos_protecao_maximo"
+                        name="pontos_protecao_maximo" min="1" required>
+                </div>
+            </div>
+
+            <div class="formulario__linha
+                       formulario__linha--duas-colunas">
+                <div class="campo">
+                    <label class="campo__rotulo" for="dano">
+                        Dano:
+                    </label>
+
+                    <input class="campo__controle" type="text" id="dano" name="dano" maxlength="50"
+                        placeholder="Preencha quando aplicável">
+                </div>
+
+                <div class="campo">
+                    <label class="campo__rotulo" for="elemento">
+                        Elemento:
+                    </label>
+
+                    <input class="campo__controle" type="text" id="elemento" name="elemento" maxlength="50"
+                        placeholder="Preencha quando aplicável">
+                </div>
+            </div>
+
+            <div class="campo">
+                <label class="campo__rotulo" for="especial">
+                    Especial:
+                </label>
+
+                <textarea class="campo__controle" id="especial" name="especial" rows="5"></textarea>
+            </div>
+
+            <div class="formulario__acoes">
+                <button class="botao botao--primario" type="submit">
+                    Cadastrar
+                </button>
+            </div>
+        </form>
+    </main>
 </body>
 
 </html>

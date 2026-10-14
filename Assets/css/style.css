@@ -25,6 +25,12 @@
     --cor-borda: #c7ae80;
     --cor-foco: #f0b95f;
 
+    /* Campos de formulário */
+    --cor-campo: #eadcbc;
+    --cor-campo-interacao: #f2e7d1;
+    --cor-borda-campo: #8e7956;
+    --cor-tinta-escrita: #39483a;
+
     /* Tipografia */
     --fonte-titulos: "Cinzel", Georgia, "Times New Roman", serif;
     --fonte-interface: "Source Sans 3", "Segoe UI", Arial, sans-serif;
@@ -46,7 +52,7 @@
     --espaco-5: 1.5rem;
     --espaco-6: 2rem;
     --espaco-7: 3rem;
-    --espaco-8: 4rem;
+    /* --espaco-8: 4rem; */
 
     /* Formas e dimensões */
     --raio-pequeno: 0.25rem;
@@ -60,6 +66,16 @@
     --sombra-suave: 0 0.5rem 1.5rem rgba(0, 0, 0, 0.18);
     --sombra-elevada: 0 1rem 2.75rem rgba(0, 0, 0, 0.28);
     --transicao-rapida: 160ms ease;
+
+    /* Texturas */
+    --textura-papel: linear-gradient(105deg,
+            rgba(255, 255, 255, 0.24),
+            transparent 38%),
+        repeating-linear-gradient(0deg,
+            transparent 0,
+            transparent 0.3rem,
+            rgba(43, 36, 27, 0.025) 0.3rem,
+            rgba(43, 36, 27, 0.025) calc(0.3rem + 1px));
 }
 
 /* =========================================================
@@ -308,24 +324,41 @@ pre {
     width: 100%;
     min-height: var(--altura-controle);
     padding: var(--espaco-3) var(--espaco-4);
-    color: var(--cor-tinta);
-    background: #fffdf8;
-    border: 1px solid #9b8d72;
-    border-radius: var(--raio-pequeno);
+    color: var(--cor-tinta-escrita);
+    background-color: var(--cor-campo);
+    border: 1px solid var(--cor-borda-campo);
+    border-radius: 0.125rem;
+    box-shadow: inset 0 0.15rem 0.3rem rgba(43, 36, 27, 0.08);
+    caret-color: var(--cor-primaria);
     transition:
+        background-color var(--transicao-rapida),
         border-color var(--transicao-rapida),
         box-shadow var(--transicao-rapida);
 }
 
 .campo__controle:hover {
+    background-color: var(--cor-campo-interacao);
     border-color: var(--cor-primaria-interacao);
 }
 
 .campo__controle:focus-visible {
+    color: var(--cor-tinta-escrita);
+    background-color: var(--cor-campo-interacao);
     border-color: var(--cor-primaria);
     outline: 3px solid rgba(47, 90, 69, 0.22);
     outline-offset: 1px;
-    box-shadow: 0 0 0 1px var(--cor-primaria);
+    box-shadow:
+        inset 0 0.15rem 0.3rem rgba(43, 36, 27, 0.08),
+        0 0 0 1px var(--cor-primaria);
+}
+
+.campo__controle::placeholder {
+    color: var(--cor-tinta-suave);
+    opacity: 1;
+}
+
+select.campo__controle:invalid {
+    color: var(--cor-tinta-suave);
 }
 
 .botao {
@@ -416,6 +449,135 @@ pre {
     color: #713f24;
 }
 
+/* Página de cadastro e edição */
+
+.pagina.pagina-formulario {
+    width: min(calc(100% - 2rem), 54rem);
+    background-color: var(--cor-papel);
+    background-image: var(--textura-papel);
+    border-radius: 0.125rem;
+    box-shadow: 0.35rem 0.4rem 0 rgba(43, 36, 27, 0.18),
+        inset 0 0 2rem rgba(180, 122, 53, 0.08);
+}
+
+.formulario-registro {
+    padding-top: var(--espaco-5);
+    border-top: 1px solid var(--cor-borda);
+}
+
+textarea.campo__controle {
+    min-height: 8rem;
+    resize: vertical;
+}
+
+.formulario__acoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--espaco-3);
+    padding-top: var(--espaco-2);
+}
+
+.formulario__linha {
+    display: grid;
+    gap: var(--espaco-4);
+}
+
+.formulario__linha--tres-colunas {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.formulario__linha--duas-colunas {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Formulários extensos divididos em seções */
+
+.pagina.pagina-formulario--larga {
+    width: min(calc(100% - 2rem), 68rem);
+}
+
+.secao-formulario {
+    min-width: 0;
+    margin: 0;
+    padding: var(--espaco-4);
+    background-color: var(--cor-papel);
+    border: 1px solid var(--cor-borda);
+    box-shadow: inset 0 0 1rem rgba(82, 65, 39, 0.06);
+}
+
+.secao-formulario__cabecalho {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--espaco-3);
+}
+
+.secao-formulario__cabecalho .secao-formulario__descricao {
+    flex: 1 1 20rem;
+}
+
+.secao-formulario__cabecalho .botao {
+    flex-shrink: 0;
+}
+
+.secao-formulario__titulo {
+    padding: 0 var(--espaco-2);
+    color: var(--cor-primaria);
+    font-family: var(--fonte-titulos);
+    font-weight: 700;
+}
+
+.secao-formulario__conteudo {
+    display: grid;
+    gap: var(--espaco-4);
+}
+
+.secao-formulario__descricao {
+    margin: 0;
+    color: var(--cor-tinta-suave);
+}
+
+.campo__erro {
+    margin: 0;
+    color: var(--cor-perigo);
+    font-weight: 700;
+}
+
+.campo__erro:empty {
+    display: none;
+}
+
+.lista-itens {
+    display: grid;
+    gap: var(--espaco-2);
+}
+
+.linha-item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 5.5rem;
+    align-items: center;
+    gap: var(--espaco-3);
+    min-height: var(--altura-controle);
+    padding: var(--espaco-2) var(--espaco-3);
+    color: var(--cor-tinta);
+    background-color: rgba(47, 90, 69, 0.06);
+    border-bottom: 1px dashed var(--cor-borda);
+}
+
+.linha-item[hidden] {
+    display: none;
+}
+
+.linha-item label {
+    cursor: pointer;
+}
+
+.linha-item__quantidade {
+    width: 100%;
+    text-align: center;
+}
+
 /* =========================================================
    7. Painel principal
    ========================================================= */
@@ -443,6 +605,75 @@ pre {
 
 .formulario-saida {
     margin: 0;
+}
+
+/* Grupos de opções dos formulários */
+.grupo-opcoes {
+    min-width: 0;
+    margin: 0;
+    padding: var(--espaco-4);
+    background-color: var(--cor-papel);
+    border: 1px solid var(--cor-borda);
+    box-shadow: inset 0 0 1rem rgba(82, 65, 39, 0.06);
+}
+
+.grupo-opcoes[hidden] {
+    display: none;
+}
+
+.grupo-opcoes__titulo {
+    padding: 0 var(--espaco-2);
+    color: var(--cor-primaria);
+    font-family: var(--fonte-titulos);
+    font-weight: 700;
+}
+
+.grupo-opcoes__lista {
+    display: grid;
+    gap: var(--espaco-2);
+}
+
+.grupo-opcoes__item {
+    display: flex;
+    align-items: center;
+    min-height: var(--altura-controle);
+    gap: var(--espaco-3);
+    padding: var(--espaco-2) var(--espaco-3);
+    color: var(--cor-tinta);
+    background-color: rgba(47, 90, 69, 0.06);
+    border-bottom: 1px dashed var(--cor-borda);
+    transition: background-color var(--transicao-rapida);
+}
+
+.grupo-opcoes__item:hover {
+    background-color: rgba(47, 90, 69, 0.12);
+}
+
+.grupo-opcoes__item:focus-within {
+    outline: 2px solid var(--cor-foco);
+    outline-offset: 2px;
+}
+
+.grupo-opcoes__item input {
+    width: 1.1rem;
+    height: 1.1rem;
+    margin: 0;
+    accent-color: var(--cor-primaria);
+}
+
+.grupo-opcoes__item label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.grupo-opcoes__item input:checked+label {
+    color: var(--cor-primaria);
+    font-weight: 700;
+}
+
+.grupo-opcoes__vazio {
+    margin: 0 0 var(--espaco-3);
+    color: var(--cor-tinta-suave);
 }
 
 .painel-secao {
@@ -488,15 +719,7 @@ pre {
     color: var(--cor-tinta);
     text-decoration: none;
     background-color: var(--cor-papel-secundario);
-    background-image:
-        linear-gradient(105deg,
-            rgba(255, 255, 255, 0.24),
-            transparent 38%),
-        repeating-linear-gradient(0deg,
-            transparent 0,
-            transparent 0.3rem,
-            rgba(43, 36, 27, 0.025) 0.3rem,
-            rgba(43, 36, 27, 0.025) calc(0.3rem + 1px));
+    background-image: var(--textura-papel);
     border: 1px solid var(--cor-borda);
     border-radius: 0.125rem;
     box-shadow:
@@ -561,6 +784,11 @@ pre {
 
 .cabecalho-com-acoes .cabecalho-pagina {
     margin-bottom: 0;
+}
+
+.cabecalho-com-acoes--titulo-longo .cabecalho-pagina__titulo {
+    font-size: clamp(1.75rem, 1.4rem + 1.5vw, 2.75rem);
+    overflow-wrap: normal;
 }
 
 .acoes-pagina {
@@ -641,18 +869,6 @@ pre {
 .cartao-profissao__descricao p {
     max-width: none;
     margin-bottom: 0;
-}
-
-@media (min-width: 40rem) {
-    .grade-profissoes {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-@media (min-width: 64rem) {
-    .grade-profissoes {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
 }
 
 .tabela-responsiva {
@@ -871,6 +1087,76 @@ pre {
 }
 
 /* Tabelas com muitas colunas em larguras intermediárias */
+@media (max-width: 30rem) {
+    .acoes-pagina .botao {
+        width: 100%;
+    }
+
+    .tabela-registro__acoes .acoes-registro {
+        grid-template-columns: 1fr;
+    }
+
+    .formulario__acoes .botao {
+        width: 100%;
+    }
+
+    .secao-formulario__cabecalho .botao {
+        width: 100%;
+    }
+}
+
+@media (min-width: 40rem) {
+    .grade-profissoes {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 48rem) {
+    .pagina {
+        width: min(calc(100% - 4rem), var(--largura-conteudo));
+        margin: var(--espaco-6) auto;
+    }
+
+    .pagina.pagina-formulario {
+        width: min(calc(100% - 4rem), 54rem);
+    }
+
+    .pagina.pagina-formulario--larga {
+        width: min(calc(100% - 4rem), 68rem);
+    }
+
+    .painel-cabecalho {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: start;
+    }
+
+    .pagina-listagem {
+        width: min(calc(100% - 4rem), 78rem);
+    }
+
+    .cabecalho-com-acoes {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+    }
+
+    .cabecalho-com-acoes.cabecalho-com-acoes--titulo-longo {
+        grid-template-columns: 1fr;
+    }
+
+    .cabecalho-com-acoes--titulo-longo .acoes-pagina {
+        justify-content: flex-end;
+    }
+
+    .grupo-opcoes__lista {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .grupo-opcoes__lista--tipos {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+}
+
 @media (min-width: 48rem) and (max-width: 60rem) {
     .tabela-registro--muitas-colunas .tabela-registro__acoes {
         width: 7rem;
@@ -892,35 +1178,9 @@ pre {
     }
 }
 
-@media (min-width: 48rem) {
-    .pagina {
-        width: min(calc(100% - 4rem), var(--largura-conteudo));
-        margin: var(--espaco-6) auto;
-    }
-
-    .painel-cabecalho {
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: start;
-    }
-
-    .pagina-listagem {
-        width: min(calc(100% - 4rem), 78rem);
-    }
-
-    .cabecalho-com-acoes {
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: end;
-    }
-
-}
-
-@media (max-width: 30rem) {
-    .acoes-pagina .botao {
-        width: 100%;
-    }
-
-    .tabela-registro__acoes .acoes-registro {
-        grid-template-columns: 1fr;
+@media (min-width: 64rem) {
+    .grade-profissoes {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
     }
 }
 

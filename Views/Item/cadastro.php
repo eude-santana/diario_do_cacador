@@ -16,65 +16,118 @@ $sucesso = $_GET["sucesso"] ?? "";
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Source+Sans+3:wght@400;600;700&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="../../Assets/css/style.css">
+
     <title>Cadastrar item — Diário do Caçador</title>
 </head>
 
 <body>
-    <h1>Cadastrar item</h1>
+    <main class="pagina pagina-formulario" aria-labelledby="titulo-pagina">
+        <div class="cabecalho-com-acoes">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Catálogo de recursos
+                </p>
 
-    <?php if ($sucesso === "1"): ?>
-        <p>Item cadastrado com sucesso!</p>
-    <?php endif; ?>
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Cadastrar item
+                </h1>
 
-    <?php if ($erro === "nome"): ?>
-        <p>Informe o nome do item.</p>
-    <?php elseif ($erro === "nome_longo"): ?>
-        <p>O nome informado excede o limite permitido. Use um nome menor.</p>
-    <?php elseif ($erro === "cadastro"): ?>
-        <p>Não foi possível cadastrar o item.</p>
-    <?php elseif ($erro === "tipo"): ?>
-        <p>Selecione um tipo de item válido.</p>
-    <?php endif; ?>
+                <p class="cabecalho-pagina__descricao">
+                    Registre um recurso que poderá ser utilizado durante
+                    as aventuras.
+                </p>
+            </header>
 
-    <form action="../../Controllers/ItemController.php" method="POST">
-        <input type="hidden" name="acao" value="cadastrar">
+            <nav class="acoes-pagina" aria-label="Ações da página">
+                <a class="botao botao--secundario" href="/Controllers/ItemController.php?acao=listar">
+                    Ver meus itens
+                </a>
 
-        <div>
-            <label for="nome">Nome:</label>
-
-            <input type="text" id="nome" name="nome" maxlength="100" required>
+                <a class="botao botao--secundario" href="../Usuario/painel.php">
+                    Voltar ao painel
+                </a>
+            </nav>
         </div>
 
-        <div>
-            <label for="tipo">Tipo:</label>
+        <?php if ($sucesso === "1"): ?>
+            <div class="mensagem mensagem--sucesso" role="status">
+                <p>Item cadastrado com sucesso!</p>
+            </div>
+        <?php endif; ?>
 
-            <select id="tipo" name="tipo" required>
-                <option value="">Selecione</option>
-                <option value="CONSUMIVEL">Consumível</option>
-                <option value="MATERIAL">Material</option>
-                <option value="UTILITARIO">Utilitário</option>
-                <option value="OUTRO">Outro</option>
-            </select>
-        </div>
+        <?php if ($erro === "nome"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>Informe o nome do item.</p>
+            </div>
+        <?php elseif ($erro === "nome_longo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    O nome informado excede o limite permitido.
+                    Use um nome menor.
+                </p>
+            </div>
+        <?php elseif ($erro === "cadastro"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>Não foi possível cadastrar o item.</p>
+            </div>
+        <?php elseif ($erro === "tipo"): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>Selecione um tipo de item válido.</p>
+            </div>
+        <?php endif; ?>
 
-        <div>
-            <label for="descricao">Descrição:</label>
+        <form class="formulario formulario-registro" action="../../Controllers/ItemController.php" method="POST">
+            <input type="hidden" name="acao" value="cadastrar">
 
-            <textarea id="descricao" name="descricao" rows="5" cols="40"></textarea>
-        </div>
+            <div class="campo">
+                <label class="campo__rotulo" for="nome">
+                    Nome
+                </label>
 
-        <button type="submit">Cadastrar</button>
-    </form>
+                <input class="campo__controle" type="text" id="nome" name="nome" maxlength="100" required>
+            </div>
 
-    <p>
-        <a href="/Controllers/ItemController.php?acao=listar">
-            Ver meus itens
-        </a>
-    </p>
+            <div class="campo">
+                <label class="campo__rotulo" for="tipo">
+                    Tipo
+                </label>
 
-    <p>
-        <a href="../Usuario/painel.php">Voltar ao painel</a>
-    </p>
+                <select class="campo__controle" id="tipo" name="tipo" required>
+                    <option value="">Selecione um tipo</option>
+                    <option value="CONSUMIVEL">Consumível</option>
+                    <option value="MATERIAL">Material</option>
+                    <option value="UTILITARIO">Utilitário</option>
+                    <option value="OUTRO">Outro</option>
+                </select>
+            </div>
+
+            <div class="campo">
+                <label class="campo__rotulo" for="descricao">
+                    Descrição
+                </label>
+
+                <small class="campo__ajuda">
+                    Campo opcional para informações adicionais sobre o item.
+                </small>
+
+                <textarea class="campo__controle" id="descricao" name="descricao" rows="5"></textarea>
+            </div>
+
+            <div class="formulario__acoes">
+                <button class="botao botao--primario" type="submit">
+                    Cadastrar item
+                </button>
+            </div>
+        </form>
+    </main>
 </body>
 
 </html>

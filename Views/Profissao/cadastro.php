@@ -66,582 +66,571 @@ $nomesTiposItem = [
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Cadastrar profissão</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
+    <title>
+        Cadastrar profissão — Diário do Caçador
+    </title>
 </head>
 
 <body>
-    <main>
-        <h1>Cadastrar profissão</h1>
+    <main class="pagina pagina-formulario pagina-formulario--larga" aria-labelledby="titulo-pagina">
+        <div class="cabecalho-com-acoes
+                   cabecalho-com-acoes--muitas-acoes">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Registro de profissão
+                </p>
+
+                <h1 class="cabecalho-pagina__titulo" id="titulo-pagina">
+                    Cadastrar profissão
+                </h1>
+
+                <p class="cabecalho-pagina__descricao">
+                    Defina as características e os recursos
+                    iniciais desta profissão.
+                </p>
+            </header>
+
+            <nav class="acoes-pagina" aria-label="Ações da página">
+                <a class="botao botao--secundario" href="/Controllers/ProfissaoController.php?acao=listar">
+                    Cancelar
+                </a>
+
+                <a class="botao botao--secundario" href="/Views/Usuario/painel.php">
+                    Voltar ao painel
+                </a>
+            </nav>
+        </div>
 
         <?php if ($erro !== ""): ?>
-            <p>
-                <?= htmlspecialchars(
-                    $erro,
-                    ENT_QUOTES,
-                    "UTF-8"
-                ) ?>
-            </p>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    <?= htmlspecialchars(
+                        $erro,
+                        ENT_QUOTES,
+                        "UTF-8"
+                    ) ?>
+                </p>
+            </div>
         <?php endif; ?>
 
-        <form action="/Controllers/ProfissaoController.php" method="POST" id="form-profissao">
+        <form class="formulario formulario-registro" action="/Controllers/ProfissaoController.php" method="POST"
+            id="form-profissao">
             <input type="hidden" name="acao" value="cadastrar">
 
-            <fieldset>
-                <legend>Dados da profissão</legend>
+            <fieldset class="secao-formulario">
+                <legend class="secao-formulario__titulo">
+                    Dados da profissão
+                </legend>
 
-                <div>
-                    <label for="nome">
-                        Nome:
-                    </label>
-
-                    <input type="text" id="nome" name="nome" maxlength="100" value="<?= htmlspecialchars(
-                        $profissao["nome"],
-                        ENT_QUOTES,
-                        "UTF-8"
-                    ) ?>" required>
-                </div>
-
-                <div>
-                    <label for="descricao">
-                        Descrição:
-                    </label>
-
-                    <textarea id="descricao" name="descricao" rows="5"><?= htmlspecialchars(
-                        $profissao["descricao"],
-                        ENT_QUOTES,
-                        "UTF-8"
-                    ) ?></textarea>
-                </div>
-
-                <div>
-                    <label for="pv_maximo">
-                        PV máximo:
-                    </label>
-
-                    <input type="number" id="pv_maximo" name="pv_maximo" min="1"
-                        value="<?= (int) $profissao["pv_maximo"] ?>" required>
-                </div>
-
-                <div>
-                    <label for="visibilidade">
-                        Visibilidade:
-                    </label>
-
-                    <select id="visibilidade" name="visibilidade" required>
-                        <option value="PRIVADO" <?= $profissao["visibilidade"] === "PRIVADO"
-                            ? "selected"
-                            : "" ?>>
-                            Privado
-                        </option>
-
-                        <option value="PUBLICO" <?= $profissao["visibilidade"] === "PUBLICO"
-                            ? "selected"
-                            : "" ?>>
-                            Público
-                        </option>
-                    </select>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Vantagens</legend>
-
-                <p>
-                    A profissão deve possuir duas vantagens diferentes.
-                </p>
-
-                <?php if (empty($vantagensDisponiveis)): ?>
-                    <p>
-                        Nenhuma vantagem cadastrada.
-                    </p>
-
-                    <a href="/Controllers/VantagemController.php?acao=novo">
-                        Cadastrar vantagem
-                    </a>
-                <?php else: ?>
-                    <div>
-                        <label for="vantagem_1">
-                            Vantagem do slot 1:
+                <div class="secao-formulario__conteudo">
+                    <div class="campo">
+                        <label class="campo__rotulo" for="nome">
+                            Nome:
                         </label>
 
-                        <select id="vantagem_1" name="vantagens[1]" required>
-                            <option value="">
-                                Selecione uma vantagem
-                            </option>
-
-                            <?php foreach (
-                                $vantagensDisponiveis as $vantagem
-                            ): ?>
-                                <?php
-                                $idVantagem =
-                                    (int) $vantagem["id_vantagem"];
-
-                                $tipoVantagem =
-                                    $vantagem["tipo"] ?? "NORMAL";
-
-                                $nomeTipo =
-                                    $tiposVantagem[$tipoVantagem]
-                                    ?? "Normal";
-                                ?>
-
-                                <option value="<?= $idVantagem ?>" <?= $idVantagem ===
-                                      (int) $vantagensSelecionadas[1]
-                                      ? "selected"
-                                      : "" ?>>
-                                    <?= htmlspecialchars(
-                                        $vantagem["nome"],
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-                                    -
-                                    <?= htmlspecialchars(
-                                        $nomeTipo,
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <input class="campo__controle" type="text" id="nome" name="nome" maxlength="100" value="<?= htmlspecialchars(
+                            $profissao["nome"],
+                            ENT_QUOTES,
+                            "UTF-8"
+                        ) ?>" required>
                     </div>
 
-                    <div>
-                        <label for="vantagem_2">
-                            Vantagem do slot 2:
+                    <div class="campo">
+                        <label class="campo__rotulo" for="descricao">
+                            Descrição:
                         </label>
 
-                        <select id="vantagem_2" name="vantagens[2]" required>
-                            <option value="">
-                                Selecione uma vantagem
-                            </option>
-
-                            <?php foreach (
-                                $vantagensDisponiveis as $vantagem
-                            ): ?>
-                                <?php
-                                $idVantagem =
-                                    (int) $vantagem["id_vantagem"];
-
-                                $tipoVantagem =
-                                    $vantagem["tipo"] ?? "NORMAL";
-
-                                $nomeTipo =
-                                    $tiposVantagem[$tipoVantagem]
-                                    ?? "Normal";
-                                ?>
-
-                                <option value="<?= $idVantagem ?>" <?= $idVantagem ===
-                                      (int) $vantagensSelecionadas[2]
-                                      ? "selected"
-                                      : "" ?>>
-                                    <?= htmlspecialchars(
-                                        $vantagem["nome"],
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-                                    -
-                                    <?= htmlspecialchars(
-                                        $nomeTipo,
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <textarea class="campo__controle" id="descricao" name="descricao" rows="5"><?= htmlspecialchars(
+                            $profissao["descricao"],
+                            ENT_QUOTES,
+                            "UTF-8"
+                        ) ?></textarea>
                     </div>
 
-                    <p id="erro-vantagens"></p>
-                <?php endif; ?>
-            </fieldset>
-
-            <fieldset>
-                <legend>Armas iniciais</legend>
-
-                <p>
-                    As armas são opcionais. Existem até três slots.
-                </p>
-
-                <?php if (empty($armasDisponiveis)): ?>
-                    <p>
-                        Nenhuma arma cadastrada.
-                    </p>
-
-                    <a href="/Controllers/ArmaController.php?acao=novo">
-                        Cadastrar arma
-                    </a>
-                <?php else: ?>
-                    <?php for ($slot = 1; $slot <= 3; $slot++): ?>
-                        <div>
-                            <label for="arma_<?= $slot ?>">
-                                Arma do slot <?= $slot ?>:
+                    <div class="formulario__linha
+                               formulario__linha--duas-colunas">
+                        <div class="campo">
+                            <label class="campo__rotulo" for="pv_maximo">
+                                PV máximo:
                             </label>
 
-                            <select id="arma_<?= $slot ?>" name="armas[<?= $slot ?>]">
-                                <option value="0">
-                                    Nenhuma arma
+                            <input class="campo__controle" type="number" id="pv_maximo" name="pv_maximo" min="1" value="<?= (int) $profissao[
+                                "pv_maximo"
+                            ] ?>" required>
+                        </div>
+
+                        <div class="campo">
+                            <label class="campo__rotulo" for="visibilidade">
+                                Visibilidade:
+                            </label>
+
+                            <select class="campo__controle" id="visibilidade" name="visibilidade" required>
+                                <option value="PRIVADO" <?= $profissao["visibilidade"]
+                                    === "PRIVADO"
+                                    ? "selected"
+                                    : "" ?>>
+                                    Privado
                                 </option>
 
-                                <?php foreach (
-                                    $armasDisponiveis as $arma
-                                ): ?>
-                                    <?php
-                                    $idArma = (int) $arma["id_arma"];
-                                    ?>
+                                <option value="PUBLICO" <?= $profissao["visibilidade"]
+                                    === "PUBLICO"
+                                    ? "selected"
+                                    : "" ?>>
+                                    Público
+                                </option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
 
-                                    <option value="<?= $idArma ?>" <?= $idArma ===
-                                          (int) (
-                                              $armasSelecionadas[$slot]
-                                              ?? 0
-                                          )
-                                          ? "selected"
-                                          : "" ?>>
-                                        <?= htmlspecialchars(
-                                            $arma["nome"],
-                                            ENT_QUOTES,
-                                            "UTF-8"
-                                        ) ?>
+            <fieldset class="secao-formulario">
+                <legend class="secao-formulario__titulo">
+                    Vantagens
+                </legend>
 
-                                        <?php if (
-                                            !empty($arma["tipo"])
-                                        ): ?>
-                                            -
+                <div class="secao-formulario__conteudo">
+                    <div class="secao-formulario__cabecalho">
+                        <p class="secao-formulario__descricao">
+                            A profissão deve possuir duas vantagens
+                            diferentes.
+                        </p>
+
+                        <a class="botao botao--secundario botao--pequeno"
+                            href="/Controllers/VantagemController.php?acao=novo" target="_blank" rel="noopener">
+                            Cadastrar nova vantagem
+                        </a>
+                    </div>
+
+                    <?php if (empty($vantagensDisponiveis)): ?>
+                        <p class="secao-formulario__descricao">
+                            Nenhuma vantagem cadastrada.
+                        </p>
+                    <?php else: ?>
+                        <div class="formulario__linha
+                                   formulario__linha--duas-colunas">
+                            <div class="campo">
+                                <label class="campo__rotulo" for="vantagem_1">
+                                    Vantagem do slot 1:
+                                </label>
+
+                                <select class="campo__controle" id="vantagem_1" name="vantagens[1]" required>
+                                    <option value="">
+                                        Selecione uma vantagem
+                                    </option>
+
+                                    <?php foreach (
+                                        $vantagensDisponiveis
+                                        as $vantagem
+                                    ): ?>
+                                        <?php
+                                        $idVantagem = (int) $vantagem[
+                                            "id_vantagem"
+                                        ];
+
+                                        $tipoVantagem =
+                                            $vantagem["tipo"]
+                                            ?? "NORMAL";
+
+                                        $nomeTipo =
+                                            $tiposVantagem[
+                                                $tipoVantagem
+                                            ] ?? "Normal";
+                                        ?>
+
+                                        <option value="<?= $idVantagem ?>" <?= $idVantagem ===
+                                              (int) $vantagensSelecionadas[1]
+                                              ? "selected"
+                                              : "" ?>>
                                             <?= htmlspecialchars(
-                                                $arma["tipo"],
+                                                $vantagem["nome"],
                                                 ENT_QUOTES,
                                                 "UTF-8"
                                             ) ?>
-                                        <?php endif; ?>
+                                            -
+                                            <?= htmlspecialchars(
+                                                $nomeTipo,
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                            <div class="campo">
+                                <label class="campo__rotulo" for="vantagem_2">
+                                    Vantagem do slot 2:
+                                </label>
+
+                                <select class="campo__controle" id="vantagem_2" name="vantagens[2]" required>
+                                    <option value="">
+                                        Selecione uma vantagem
                                     </option>
-                                <?php endforeach; ?>
-                            </select>
+
+                                    <?php foreach (
+                                        $vantagensDisponiveis
+                                        as $vantagem
+                                    ): ?>
+                                        <?php
+                                        $idVantagem = (int) $vantagem[
+                                            "id_vantagem"
+                                        ];
+
+                                        $tipoVantagem =
+                                            $vantagem["tipo"]
+                                            ?? "NORMAL";
+
+                                        $nomeTipo =
+                                            $tiposVantagem[
+                                                $tipoVantagem
+                                            ] ?? "Normal";
+                                        ?>
+
+                                        <option value="<?= $idVantagem ?>" <?= $idVantagem ===
+                                              (int) $vantagensSelecionadas[2]
+                                              ? "selected"
+                                              : "" ?>>
+                                            <?= htmlspecialchars(
+                                                $vantagem["nome"],
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ) ?>
+                                            -
+                                            <?= htmlspecialchars(
+                                                $nomeTipo,
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
                         </div>
-                    <?php endfor; ?>
-                <?php endif; ?>
+
+                        <p class="campo__erro" id="erro-vantagens" role="alert"></p>
+                    <?php endif; ?>
+                </div>
             </fieldset>
 
-            <fieldset>
-                <legend>Vestimentas iniciais</legend>
+            <fieldset class="secao-formulario">
+                <legend class="secao-formulario__titulo">
+                    Armas iniciais
+                </legend>
 
-                <p>
-                    Cada vestimenta só pode ocupar o slot correspondente
-                    ao seu tipo.
-                </p>
+                <div class="secao-formulario__conteudo">
+                    <div class="secao-formulario__cabecalho">
+                        <p class="secao-formulario__descricao">
+                            As armas são opcionais. Existem até três
+                            slots.
+                        </p>
 
-                <?php if (empty($vestimentasDisponiveis)): ?>
-                    <p>
-                        Nenhuma vestimenta cadastrada.
-                    </p>
+                        <a class="botao botao--secundario botao--pequeno"
+                            href="/Controllers/ArmaController.php?acao=novo" target="_blank" rel="noopener">
+                            Cadastrar nova arma
+                        </a>
+                    </div>
 
-                    <a href="/Controllers/VestimentaController.php?acao=novo">
-                        Cadastrar vestimenta
-                    </a>
-                <?php else: ?>
-                    <?php foreach (
-                        $nomesSlotsVestimenta as
-                        $tipoSlot => $nomeSlot
-                    ): ?>
-                        <div>
-                            <label for="vestimenta_<?= $tipoSlot ?>">
-                                <?= htmlspecialchars(
-                                    $nomeSlot,
+                    <?php if (empty($armasDisponiveis)): ?>
+                        <p class="secao-formulario__descricao">
+                            Nenhuma arma cadastrada.
+                        </p>
+                    <?php else: ?>
+                        <div class="formulario__linha
+                                   formulario__linha--tres-colunas">
+                            <?php for (
+                                $slot = 1;
+                                $slot <= 3;
+                                $slot++
+                            ): ?>
+                                <div class="campo">
+                                    <label class="campo__rotulo" for="arma_<?= $slot ?>">
+                                        Arma do slot <?= $slot ?>:
+                                    </label>
+
+                                    <select class="campo__controle" id="arma_<?= $slot ?>" name="armas[<?= $slot ?>]">
+                                        <option value="0">
+                                            Nenhuma arma
+                                        </option>
+
+                                        <?php foreach (
+                                            $armasDisponiveis
+                                            as $arma
+                                        ): ?>
+                                            <?php
+                                            $idArma =
+                                                (int) $arma["id_arma"];
+                                            ?>
+
+                                            <option value="<?= $idArma ?>" <?= $idArma ===
+                                                  (int) (
+                                                      $armasSelecionadas[
+                                                          $slot
+                                                      ] ?? 0
+                                                  )
+                                                  ? "selected"
+                                                  : "" ?>>
+                                                <?= htmlspecialchars(
+                                                    $arma["nome"],
+                                                    ENT_QUOTES,
+                                                    "UTF-8"
+                                                ) ?>
+
+                                                <?php if (
+                                                    !empty($arma["tipo"])
+                                                ): ?>
+                                                    -
+                                                    <?= htmlspecialchars(
+                                                        $arma["tipo"],
+                                                        ENT_QUOTES,
+                                                        "UTF-8"
+                                                    ) ?>
+                                                <?php endif; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php endfor; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </fieldset>
+
+            <fieldset class="secao-formulario">
+                <legend class="secao-formulario__titulo">
+                    Vestimentas iniciais
+                </legend>
+
+                <div class="secao-formulario__conteudo">
+                    <div class="secao-formulario__cabecalho">
+                        <p class="secao-formulario__descricao">
+                            Cada vestimenta só pode ocupar o slot
+                            correspondente ao seu tipo.
+                        </p>
+
+                        <a class="botao botao--secundario botao--pequeno"
+                            href="/Controllers/VestimentaController.php?acao=novo" target="_blank" rel="noopener">
+                            Cadastrar nova vestimenta
+                        </a>
+                    </div>
+
+                    <?php if (empty($vestimentasDisponiveis)): ?>
+                        <p class="secao-formulario__descricao">
+                            Nenhuma vestimenta cadastrada.
+                        </p>
+                    <?php else: ?>
+                        <div class="formulario__linha
+                                   formulario__linha--duas-colunas">
+                            <?php foreach (
+                                $nomesSlotsVestimenta as
+                                $tipoSlot => $nomeSlot
+                            ): ?>
+                                <div class="campo">
+                                    <label class="campo__rotulo" for="vestimenta_<?= $tipoSlot ?>">
+                                        <?= htmlspecialchars(
+                                            $nomeSlot,
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ) ?>:
+                                    </label>
+
+                                    <select class="campo__controle" id="vestimenta_<?= $tipoSlot ?>"
+                                        name="vestimentas[<?= $tipoSlot ?>]">
+                                        <option value="0">
+                                            Nenhuma
+                                        </option>
+
+                                        <?php foreach (
+                                            $vestimentasDisponiveis
+                                            as $vestimenta
+                                        ): ?>
+                                            <?php
+                                            if (
+                                                $vestimenta["tipo"]
+                                                !== $tipoSlot
+                                            ) {
+                                                continue;
+                                            }
+
+                                            $idVestimenta =
+                                                (int) $vestimenta[
+                                                    "id_vestimenta"
+                                                ];
+                                            ?>
+
+                                            <option value="<?= $idVestimenta ?>" <?= $idVestimenta ===
+                                                  (int) (
+                                                      $vestimentasSelecionadas[
+                                                          $tipoSlot
+                                                      ] ?? 0
+                                                  )
+                                                  ? "selected"
+                                                  : "" ?>>
+                                                <?= htmlspecialchars(
+                                                    $vestimenta["nome"],
+                                                    ENT_QUOTES,
+                                                    "UTF-8"
+                                                ) ?>
+
+                                                <?php if (
+                                                    isset(
+                                                    $vestimenta[
+                                                        "pontos_protecao_maximo"
+                                                    ]
+                                                )
+                                                ): ?>
+                                                    -
+                                                    <?= (int) $vestimenta[
+                                                        "pontos_protecao_maximo"
+                                                    ] ?> PP
+                                                <?php endif; ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </fieldset>
+
+            <fieldset class="secao-formulario">
+                <legend class="secao-formulario__titulo">
+                    Itens iniciais
+                </legend>
+
+                <div class="secao-formulario__conteudo">
+                    <div class="secao-formulario__cabecalho">
+                        <p class="secao-formulario__descricao">
+                            Use os filtros para localizar os itens e
+                            informe somente as quantidades desejadas.
+                        </p>
+
+                        <a class="botao botao--secundario botao--pequeno"
+                            href="/Controllers/ItemController.php?acao=novo" target="_blank" rel="noopener">
+                            Cadastrar novo item
+                        </a>
+                    </div>
+
+                    <?php if (empty($itensDisponiveis)): ?>
+                        <p class="secao-formulario__descricao">
+                            Nenhum item cadastrado.
+                        </p>
+                    <?php else: ?>
+                        <div class="formulario__linha
+                                   formulario__linha--duas-colunas">
+                            <div class="campo">
+                                <label class="campo__rotulo" for="pesquisa_item">
+                                    Pesquisar item:
+                                </label>
+
+                                <input class="campo__controle" type="search" id="pesquisa_item"
+                                    placeholder="Digite o nome do item">
+                            </div>
+
+                            <div class="campo">
+                                <label class="campo__rotulo" for="filtro_tipo_item">
+                                    Tipo:
+                                </label>
+
+                                <select class="campo__controle" id="filtro_tipo_item">
+                                    <option value="">
+                                        Todos os tipos
+                                    </option>
+
+                                    <?php foreach (
+                                        $nomesTiposItem as
+                                        $valorTipo => $nomeTipo
+                                    ): ?>
+                                        <option value="<?= $valorTipo ?>">
+                                            <?= htmlspecialchars(
+                                                $nomeTipo,
+                                                ENT_QUOTES,
+                                                "UTF-8"
+                                            ) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="lista-itens" id="lista_itens">
+                            <?php foreach (
+                                $itensDisponiveis as $item
+                            ): ?>
+                                <?php
+                                $idItem = (int) $item["id_item"];
+
+                                $tipoItem =
+                                    $item["tipo"] ?? "OUTRO";
+
+                                $nomeTipoItem =
+                                    $nomesTiposItem[$tipoItem]
+                                    ?? "Outro";
+
+                                $quantidade = (int) (
+                                    $itensSelecionados[
+                                        $idItem
+                                    ] ?? 0
+                                );
+                                ?>
+
+                                <div class="linha-item" data-nome="<?= htmlspecialchars(
+                                    $item["nome"],
                                     ENT_QUOTES,
                                     "UTF-8"
-                                ) ?>:
-                            </label>
-
-                            <select id="vestimenta_<?= $tipoSlot ?>" name="vestimentas[<?= $tipoSlot ?>]">
-                                <option value="0">
-                                    Nenhuma
-                                </option>
-
-                                <?php foreach (
-                                    $vestimentasDisponiveis as
-                                    $vestimenta
-                                ): ?>
-                                    <?php
-                                    if (
-                                        $vestimenta["tipo"] !==
-                                        $tipoSlot
-                                    ) {
-                                        continue;
-                                    }
-
-                                    $idVestimenta =
-                                        (int) $vestimenta[
-                                            "id_vestimenta"
-                                        ];
-                                    ?>
-
-                                    <option value="<?= $idVestimenta ?>" <?= $idVestimenta ===
-                                          (int) (
-                                              $vestimentasSelecionadas[
-                                                  $tipoSlot
-                                              ] ?? 0
-                                          )
-                                          ? "selected"
-                                          : "" ?>>
+                                ) ?>" data-tipo="<?= htmlspecialchars(
+                                     $tipoItem,
+                                     ENT_QUOTES,
+                                     "UTF-8"
+                                 ) ?>">
+                                    <label for="item_<?= $idItem ?>">
                                         <?= htmlspecialchars(
-                                            $vestimenta["nome"],
+                                            $item["nome"],
                                             ENT_QUOTES,
                                             "UTF-8"
                                         ) ?>
 
-                                        <?php if (
-                                            isset(
-                                            $vestimenta[
-                                                "pontos_protecao_maximo"
-                                            ]
-                                        )
-                                        ): ?>
-                                            -
-                                            <?= (int) $vestimenta[
-                                                "pontos_protecao_maximo"
-                                            ] ?> PP
-                                        <?php endif; ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </fieldset>
+                                        (
+                                        <?= htmlspecialchars(
+                                            $nomeTipoItem,
+                                            ENT_QUOTES,
+                                            "UTF-8"
+                                        ) ?>
+                                        ):
+                                    </label>
 
-            <fieldset>
-                <legend>Itens iniciais</legend>
-
-                <p>
-                    Use os filtros para localizar os itens e informe
-                    somente as quantidades desejadas.
-                </p>
-
-                <?php if (empty($itensDisponiveis)): ?>
-                    <p>
-                        Nenhum item cadastrado.
-                    </p>
-
-                    <a href="/Controllers/ItemController.php?acao=novo">
-                        Cadastrar item
-                    </a>
-                <?php else: ?>
-                    <div>
-                        <label for="pesquisa_item">
-                            Pesquisar item:
-                        </label>
-
-                        <input type="search" id="pesquisa_item" placeholder="Digite o nome do item">
-                    </div>
-
-                    <div>
-                        <label for="filtro_tipo_item">
-                            Tipo:
-                        </label>
-
-                        <select id="filtro_tipo_item">
-                            <option value="">
-                                Todos os tipos
-                            </option>
-
-                            <?php foreach (
-                                $nomesTiposItem as $valorTipo => $nomeTipo
-                            ): ?>
-                                <option value="<?= $valorTipo ?>">
-                                    <?= htmlspecialchars(
-                                        $nomeTipo,
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-                                </option>
+                                    <input class="campo__controle
+                                               linha-item__quantidade" type="number" id="item_<?= $idItem ?>"
+                                        name="itens[<?= $idItem ?>]" min="0" value="<?= $quantidade ?>">
+                                </div>
                             <?php endforeach; ?>
-                        </select>
-                    </div>
+                        </div>
 
-                    <div id="lista_itens">
-                        <?php foreach ($itensDisponiveis as $item): ?>
-                            <?php
-                            $idItem = (int) $item["id_item"];
-
-                            $tipoItem = $item["tipo"] ?? "OUTRO";
-
-                            $nomeTipoItem =
-                                $nomesTiposItem[$tipoItem] ?? "Outro";
-
-                            $quantidade = (int) (
-                                $itensSelecionados[$idItem] ?? 0
-                            );
-                            ?>
-
-                            <div class="linha-item" data-nome="<?= htmlspecialchars(
-                                $item["nome"],
-                                ENT_QUOTES,
-                                "UTF-8"
-                            ) ?>" data-tipo="<?= htmlspecialchars(
-                                 $tipoItem,
-                                 ENT_QUOTES,
-                                 "UTF-8"
-                             ) ?>">
-                                <label for="item_<?= $idItem ?>">
-                                    <?= htmlspecialchars(
-                                        $item["nome"],
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-
-                                    (
-                                    <?= htmlspecialchars(
-                                        $nomeTipoItem,
-                                        ENT_QUOTES,
-                                        "UTF-8"
-                                    ) ?>
-                                    ):
-                                </label>
-
-                                <input type="number" id="item_<?= $idItem ?>" name="itens[<?= $idItem ?>]" min="0"
-                                    value="<?= $quantidade ?>">
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-
-                    <p id="mensagem_sem_itens" hidden>
-                        Nenhum item encontrado com esses filtros.
-                    </p>
-                <?php endif; ?>
+                        <p class="secao-formulario__descricao" id="mensagem_sem_itens" hidden>
+                            Nenhum item encontrado com esses
+                            filtros.
+                        </p>
+                    <?php endif; ?>
+                </div>
             </fieldset>
 
-            <div>
-                <button type="submit">
+            <div class="formulario__acoes">
+                <button class="botao botao--primario" type="submit">
                     Cadastrar profissão
                 </button>
-
-                <a href="/Controllers/ProfissaoController.php?acao=listar">
-                    Cancelar
-                </a>
             </div>
         </form>
-
-        <p>
-            <a href="/Views/Usuario/painel.php">
-                Voltar ao painel
-            </a>
-        </p>
     </main>
-
-    <script>
-        const formProfissao =
-            document.getElementById("form-profissao");
-
-        const vantagem1 =
-            document.getElementById("vantagem_1");
-
-        const vantagem2 =
-            document.getElementById("vantagem_2");
-
-        const erroVantagens =
-            document.getElementById("erro-vantagens");
-
-        if (vantagem1 && vantagem2 && erroVantagens) {
-            function validarVantagens() {
-                if (
-                    vantagem1.value !== "" &&
-                    vantagem1.value === vantagem2.value
-                ) {
-                    erroVantagens.textContent =
-                        "As duas vantagens devem ser diferentes.";
-
-                    vantagem2.setCustomValidity(
-                        "Selecione uma vantagem diferente."
-                    );
-
-                    return false;
-                }
-
-                erroVantagens.textContent = "";
-                vantagem2.setCustomValidity("");
-
-                return true;
-            }
-
-            vantagem1.addEventListener(
-                "change",
-                validarVantagens
-            );
-
-            vantagem2.addEventListener(
-                "change",
-                validarVantagens
-            );
-
-            formProfissao.addEventListener(
-                "submit",
-                validarVantagens
-            );
-        }
-
-        const pesquisaItem =
-            document.getElementById("pesquisa_item");
-
-        const filtroTipoItem =
-            document.getElementById("filtro_tipo_item");
-
-        const linhasItens =
-            document.querySelectorAll(".linha-item");
-
-        const mensagemSemItens =
-            document.getElementById("mensagem_sem_itens");
-
-        function filtrarItens() {
-            if (!pesquisaItem || !filtroTipoItem) {
-                return;
-            }
-
-            const textoPesquisado =
-                pesquisaItem.value.trim().toLocaleLowerCase();
-
-            const tipoSelecionado =
-                filtroTipoItem.value;
-
-            let quantidadeVisivel = 0;
-
-            linhasItens.forEach(function (linha) {
-                const nomeItem =
-                    linha.dataset.nome.toLocaleLowerCase();
-
-                const tipoItem =
-                    linha.dataset.tipo;
-
-                const correspondeNome =
-                    nomeItem.includes(textoPesquisado);
-
-                const correspondeTipo =
-                    tipoSelecionado === "" ||
-                    tipoItem === tipoSelecionado;
-
-                const deveMostrar =
-                    correspondeNome && correspondeTipo;
-
-                linha.hidden = !deveMostrar;
-
-                if (deveMostrar) {
-                    quantidadeVisivel++;
-                }
-            });
-
-            if (mensagemSemItens) {
-                mensagemSemItens.hidden =
-                    quantidadeVisivel !== 0;
-            }
-        }
-
-        if (pesquisaItem && filtroTipoItem) {
-            pesquisaItem.addEventListener(
-                "input",
-                filtrarItens
-            );
-
-            filtroTipoItem.addEventListener(
-                "change",
-                filtrarItens
-            );
-        }
-    </script>
-</body>
 
 </html>
