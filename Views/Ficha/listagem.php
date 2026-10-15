@@ -22,90 +22,126 @@ function escaparListagemFicha($valor): string
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Meus personagens</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="/Assets/css/style.css">
+
+    <title>Meus personagens — Diário do Caçador</title>
 </head>
 
 <body>
-    <h1>Meus personagens</h1>
+    <main class="pagina pagina-listagem">
+        <div class="cabecalho-com-acoes">
+            <header class="cabecalho-pagina">
+                <p class="cabecalho-pagina__marca">
+                    Diário do Caçador
+                </p>
 
-    <?php if ($mensagem !== ''): ?>
-        <p>
-            <?php echo escaparListagemFicha($mensagem); ?>
-        </p>
-    <?php endif; ?>
+                <h1 class="cabecalho-pagina__titulo">
+                    Meus personagens
+                </h1>
 
-    <?php if ($erro !== ''): ?>
-        <p>
-            <?php echo escaparListagemFicha($erro); ?>
-        </p>
-    <?php endif; ?>
+                <p class="cabecalho-pagina__descricao">
+                    Consulte e gerencie os personagens da sua jornada.
+                </p>
+            </header>
 
-    <p>
-        <a href="/Controllers/FichaController.php?acao=novo">
-            Criar personagem
-        </a>
-    </p>
+            <nav class="acoes-pagina" aria-label="Ações da página">
+                <a class="botao botao--primario" href="/Controllers/FichaController.php?acao=novo">
+                    Criar personagem
+                </a>
 
-    <?php if (empty($fichas)): ?>
-        <p>
-            Nenhum personagem cadastrado.
-        </p>
-    <?php else: ?>
-        <table border="1">
-            <thead>
-                <tr>
-                    <th>Personagem</th>
-                    <th>Profissão</th>
-                    <th>PV</th>
-                    <th>Fadiga</th>
-                    <th>Ações</th>
-                </tr>
-            </thead>
+                <a class="botao botao--secundario" href="/Views/Usuario/painel.php">
+                    Voltar ao painel
+                </a>
+            </nav>
+        </div>
 
-            <tbody>
+        <?php if ($mensagem !== ''): ?>
+            <div class="mensagem mensagem--sucesso" role="status">
+                <p>
+                    <?php echo escaparListagemFicha($mensagem); ?>
+                </p>
+            </div>
+        <?php endif; ?>
+
+        <?php if ($erro !== ''): ?>
+            <div class="mensagem mensagem--erro" role="alert">
+                <p>
+                    <?php echo escaparListagemFicha($erro); ?>
+                </p>
+            </div>
+        <?php endif; ?>
+
+        <?php if (empty($fichas)): ?>
+            <div class="estado-vazio">
+                <p>Nenhum personagem cadastrado.</p>
+
+                <p>
+                    Crie seu primeiro personagem para iniciar uma jornada.
+                </p>
+            </div>
+        <?php else: ?>
+            <section class="grade-personagens" aria-label="Personagens cadastrados">
                 <?php foreach ($fichas as $ficha): ?>
-                    <tr>
-                        <td>
-                            <?php
-                            echo escaparListagemFicha(
-                                $ficha['nome']
-                            );
-                            ?>
-                        </td>
+                    <article class="cartao-personagem">
+                        <header class="cartao-personagem__cabecalho">
+                            <p class="cartao-personagem__marca">
+                                Registro de personagem
+                            </p>
 
-                        <td>
-                            <?php
-                            echo escaparListagemFicha(
-                                $ficha['nome_profissao']
-                            );
-                            ?>
-                        </td>
+                            <h2 class="cartao-personagem__titulo">
+                                <?php
+                                echo escaparListagemFicha(
+                                    $ficha['nome']
+                                );
+                                ?>
+                            </h2>
 
-                        <td>
-                            <?php
-                            echo (int) $ficha['pv_atual'];
-                            ?>
-                            /
-                            <?php
-                            echo (int) $ficha['pv_maximo'];
-                            ?>
-                        </td>
+                            <p class="cartao-personagem__profissao">
+                                <?php
+                                echo escaparListagemFicha(
+                                    $ficha['nome_profissao']
+                                );
+                                ?>
+                            </p>
+                        </header>
 
-                        <td>
-                            <?php
-                            echo (int) $ficha['fadiga'];
-                            ?>
-                            / 6
-                        </td>
+                        <dl class="cartao-personagem__atributos">
+                            <div class="cartao-personagem__atributo">
+                                <dt>PV</dt>
 
-                        <td>
-                            <a href="/Controllers/FichaController.php?acao=gerenciar&id=<?php
+                                <dd>
+                                    <?php echo (int) $ficha['pv_atual']; ?>
+                                    /
+                                    <?php echo (int) $ficha['pv_maximo']; ?>
+                                </dd>
+                            </div>
+
+                            <div class="cartao-personagem__atributo">
+                                <dt>Fadiga</dt>
+
+                                <dd>
+                                    <?php echo (int) $ficha['fadiga']; ?>
+                                    / 6
+                                </dd>
+                            </div>
+                        </dl>
+
+                        <div class="cartao-personagem__acoes">
+                            <a class="botao botao--primario" href="/Controllers/FichaController.php?acao=gerenciar&amp;id=<?php
                             echo (int) $ficha['id_ficha'];
                             ?>">
                                 Gerenciar
                             </a>
 
-                            <form action="/Controllers/FichaController.php" method="POST" onsubmit="
+                            <form class="cartao-personagem__formulario" action="/Controllers/FichaController.php" method="POST"
+                                onsubmit="
                                     return confirm(
                                         'Deseja realmente excluir esta ficha?'
                                     );
@@ -116,22 +152,16 @@ function escaparListagemFicha($valor): string
                                 echo (int) $ficha['id_ficha'];
                                 ?>">
 
-                                <button type="submit">
+                                <button class="botao botao--perigo" type="submit">
                                     Excluir
                                 </button>
                             </form>
-                        </td>
-                    </tr>
+                        </div>
+                    </article>
                 <?php endforeach; ?>
-            </tbody>
-        </table>
-    <?php endif; ?>
-
-    <br>
-
-    <a href="/Views/Usuario/painel.php">
-        Voltar ao painel
-    </a>
+            </section>
+        <?php endif; ?>
+    </main>
 </body>
 
 </html>

@@ -218,7 +218,7 @@ $nomesTiposItem = [
                         </p>
                     <?php else: ?>
                         <div class="formulario__linha
-                                   formulario__linha--duas-colunas">
+                                   formulario__linha--duas-colunas formulario__linha--campos-longos">
                             <div class="campo">
                                 <label class="campo__rotulo" for="vantagem_1">
                                     Vantagem do slot 1:
@@ -347,7 +347,7 @@ $nomesTiposItem = [
                         </p>
                     <?php else: ?>
                         <div class="formulario__linha
-                                   formulario__linha--tres-colunas">
+                                   formulario__linha--tres-colunas formulario__linha--campos-longos">
                             <?php for (
                                 $slot = 1;
                                 $slot <= 3;
@@ -430,7 +430,7 @@ $nomesTiposItem = [
                         </p>
                     <?php else: ?>
                         <div class="formulario__linha
-                                   formulario__linha--duas-colunas">
+                                   formulario__linha--duas-colunas formulario__linha--campos-longos ">
                             <?php foreach (
                                 $nomesSlotsVestimenta as
                                 $tipoSlot => $nomeSlot
@@ -528,7 +528,7 @@ $nomesTiposItem = [
                         </p>
                     <?php else: ?>
                         <div class="formulario__linha
-                                   formulario__linha--duas-colunas">
+                                   formulario__linha--duas-colunas formulario__linha--campos-longos">
                             <div class="campo">
                                 <label class="campo__rotulo" for="pesquisa_item">
                                     Pesquisar item:

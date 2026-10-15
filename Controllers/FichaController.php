@@ -130,7 +130,7 @@ switch ($acao) {
                 'Location: /Controllers/FichaController.php'
                 . '?acao=gerenciar'
                 . '&id=' . $idFicha
-                . '&sucesso=magia_adicionada'
+                . '&sucesso=magia_adicionada#magias'
             );
             exit;
         } catch (Throwable $erro) {
@@ -139,6 +139,7 @@ switch ($acao) {
                 . '?acao=gerenciar'
                 . '&id=' . $idFicha
                 . '&erro=' . urlencode($erro->getMessage())
+                . '#magias'
             );
             exit;
         }
@@ -182,7 +183,7 @@ switch ($acao) {
                 'Location: /Controllers/FichaController.php'
                 . '?acao=gerenciar'
                 . '&id=' . $idFicha
-                . '&sucesso=magia_removida'
+                . '&sucesso=magia_removida#magias'
             );
             exit;
         } catch (Throwable $erro) {
@@ -191,6 +192,7 @@ switch ($acao) {
                 . '?acao=gerenciar'
                 . '&id=' . $idFicha
                 . '&erro=' . urlencode($erro->getMessage())
+                . '#magias'
             );
             exit;
         }
@@ -575,7 +577,7 @@ function atualizarCompanheiroFicha(
         header(
             'Location: /Controllers/FichaController.php'
             . '?acao=gerenciar&id=' . $idFicha
-            . '&sucesso=companheiro'
+            . '&sucesso=companheiro#companheiro'
         );
         exit;
     } catch (InvalidArgumentException $excecao) {
@@ -669,7 +671,7 @@ function atualizarItemFicha(
         header(
             'Location: /Controllers/FichaController.php'
             . '?acao=gerenciar&id=' . $idFicha
-            . '&sucesso=item'
+            . '&sucesso=item#mochila'
         );
         exit;
     } catch (InvalidArgumentException $excecao) {
@@ -754,7 +756,7 @@ function atualizarArmaFicha(
         header(
             'Location: /Controllers/FichaController.php'
             . '?acao=gerenciar&id=' . $idFicha
-            . '&sucesso=arma'
+            . '&sucesso=arma#armas'
         );
         exit;
     } catch (InvalidArgumentException $excecao) {
@@ -848,7 +850,7 @@ function equiparVestimentaFicha(
         header(
             'Location: /Controllers/FichaController.php'
             . '?acao=gerenciar&id=' . $idFicha
-            . '&sucesso=vestimenta'
+            . '&sucesso=vestimenta#vestimentas'
         );
         exit;
     } catch (InvalidArgumentException $excecao) {
@@ -932,7 +934,7 @@ function atualizarProtecaoFicha(
         header(
             'Location: /Controllers/FichaController.php'
             . '?acao=gerenciar&id=' . $idFicha
-            . '&sucesso=protecao'
+            . '&sucesso=protecao#vestimentas'
         );
         exit;
     } catch (InvalidArgumentException $excecao) {
@@ -1041,7 +1043,7 @@ function atualizarDadosFicha(
         header(
             'Location: /Controllers/FichaController.php'
             . '?acao=gerenciar&id=' . $idFicha
-            . '&sucesso=dados'
+            . '&sucesso=dados#dados'
         );
         exit;
     } catch (InvalidArgumentException $excecao) {
