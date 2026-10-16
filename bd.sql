@@ -599,4 +599,11 @@ CREATE TABLE ficha_item (
 --     podem aprender magias.
 --
 -- 14. A ficha pertence ao usuário e permanece privada.
+--
+-- 15. Desativar uma conta impede novos acessos, encerra sua
+--     sessão e preserva os conteúdos relacionados ao usuário.
+--
+-- 16. O e-mail original de uma conta desativada pode ser usado
+--     em um novo cadastro. A nova conta não recupera os dados
+--     associados ao usuário anterior.
 -- =========================================================
