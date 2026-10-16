@@ -1,8 +1,17 @@
 <?php
 
+session_start();
+
 require_once __DIR__ . "/../Models/Usuario.php";
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    header("Location: ../Views/Usuario/cadastro.php");
+    exit;
+}
+
+$acao = $_POST["acao"] ?? "cadastrar";
+
+if (!is_string($acao)) {
     header("Location: ../Views/Usuario/cadastro.php");
     exit;
 }

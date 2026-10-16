@@ -157,6 +157,21 @@ exigirLogin();
                 </ul>
             </section>
         </nav>
+
+        <section class="painel-secao painel-secao--conta" aria-labelledby="menu-conta">
+
+            <h2 class="painel-secao__titulo" id="menu-conta">
+                Conta
+            </h2>
+
+            <p class="painel-secao__descricao">
+                Encerre permanentemente o acesso a esta conta.
+            </p>
+
+            <a class="botao botao--perigo" href="/Views/Usuario/desativar.php">
+                Desativar conta
+            </a>
+        </section>
     </main>
 </body>
 

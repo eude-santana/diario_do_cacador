@@ -497,6 +497,8 @@ function escaparGerenciamento(mixed $valor): string
 
         <hr>
 
+        <hr>
+
         <section class="secao-ficha" id="vestimentas">
             <header class="secao-ficha__cabecalho secao-ficha__cabecalho--com-acao">
                 <div class="secao-ficha__introducao">
@@ -538,219 +540,220 @@ function escaparGerenciamento(mixed $valor): string
             }
             ?>
 
-            <div class="grade-slots-ficha">
-                <?php foreach (
-                    $nomesTiposVestimenta
-                    as $tipoSlot => $nomeTipo
-                ): ?>
-                    <?php
-                    $vestimentaAtual =
-                        $vestimentasPorSlot[$tipoSlot] ?? null;
-                    ?>
+            <?php foreach (
+                $nomesTiposVestimenta
+                as $tipoSlot => $nomeTipo
+            ): ?>
+                <?php
+                $vestimentaAtual =
+                    $vestimentasPorSlot[$tipoSlot] ?? null;
+                ?>
 
-                    <article class="slot-ficha">
-                        <header class="slot-ficha__cabecalho">
-                            <p class="slot-ficha__numero">
-                                <?php echo escaparGerenciamento($nomeTipo); ?>
-                            </p>
+                <div class="grade-slots-ficha"></div>
 
-                            <h3 class="slot-ficha__titulo">
-                                <?php if ($vestimentaAtual === null): ?>
-                                    Espaço vazio
-                                <?php else: ?>
+                <article class="slot-ficha">
+                    <header class="slot-ficha__cabecalho">
+                        <p class="slot-ficha__numero">
+                            <?php echo escaparGerenciamento($nomeTipo); ?>
+                        </p>
+
+                        <h3 class="slot-ficha__titulo">
+                            <?php if ($vestimentaAtual === null): ?>
+                                Espaço vazio
+                            <?php else: ?>
+                                <?php
+                                echo escaparGerenciamento(
+                                    $vestimentaAtual['nome']
+                                );
+                                ?>
+                            <?php endif; ?>
+                        </h3>
+                    </header>
+
+                    <form id="form_equipar_<?php
+                    echo escaparGerenciamento($tipoSlot);
+                    ?>" class="formulario slot-ficha__formulario" action="/Controllers/FichaController.php" method="POST">
+                        <input type="hidden" name="acao" value="equipar_vestimenta">
+
+                        <input type="hidden" name="id_ficha" value="<?php
+                        echo (int) $ficha['id_ficha'];
+                        ?>">
+
+                        <input type="hidden" name="tipo_slot" value="<?php
+                        echo escaparGerenciamento($tipoSlot);
+                        ?>">
+
+                        <label for="vestimenta_<?php
+                        echo escaparGerenciamento($tipoSlot);
+                        ?>">
+                            Equipamento:
+                        </label>
+
+                        <select class="campo__controle" name="id_vestimenta"
+                            id="vestimenta_<?php echo escaparGerenciamento($tipoSlot); ?>">
+                            <option value="">
+                                Espaço vazio
+                            </option>
+
+                            <?php foreach (
+                                $vestimentasDisponiveis
+                                as $vestimentaDisponivel
+                            ): ?>
+                                <?php if (
+                                    $vestimentaDisponivel['tipo']
+                                    !== $tipoSlot
+                                ): ?>
+                                    <?php continue; ?>
+                                <?php endif; ?>
+
+                                <option value="<?php
+                                echo (int) $vestimentaDisponivel[
+                                    'id_vestimenta'
+                                ];
+                                ?>" <?php
+                                if (
+                                    $vestimentaAtual !== null
+                                    && (int) $vestimentaAtual[
+                                        'id_vestimenta'
+                                    ]
+                                    === (int) $vestimentaDisponivel[
+                                        'id_vestimenta'
+                                    ]
+                                ) {
+                                    echo 'selected';
+                                }
+                                ?>>
                                     <?php
                                     echo escaparGerenciamento(
-                                        $vestimentaAtual['nome']
+                                        $vestimentaDisponivel['nome']
                                     );
                                     ?>
-                                <?php endif; ?>
-                            </h3>
-                        </header>
+                                    —
+                                    <?php
+                                    echo (int) $vestimentaDisponivel[
+                                        'pontos_protecao_maximo'
+                                    ];
+                                    ?>
+                                    PP
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
 
-                        <form id="form_equipar_<?php echo escaparGerenciamento($tipoSlot); ?>"
-                            class="formulario slot-ficha__formulario" action="/Controllers/FichaController.php"
-                            method="POST">
-                            <input type="hidden" name="acao" value="equipar_vestimenta">
 
-                            <input type="hidden" name="id_ficha" value="<?php
-                            echo (int) $ficha['id_ficha'];
-                            ?>">
+                    </form>
+
+                    <?php if ($vestimentaAtual === null): ?>
+                        <p class="slot-ficha__vazio">
+                            Nenhuma vestimenta equipada neste espaço.
+                        </p>
+                    <?php else: ?>
+                        <form id="form_protecao_<?php echo escaparGerenciamento($tipoSlot); ?>"
+                            class="formulario slot-ficha__formulario" action="/Controllers/FichaController.php" method="POST">
+                            <input type="hidden" name="acao" value="atualizar_protecao">
+
+                            <input type="hidden" name="id_ficha" value="<?php echo (int) $ficha['id_ficha']; ?>">
 
                             <input type="hidden" name="tipo_slot" value="<?php
                             echo escaparGerenciamento($tipoSlot);
                             ?>">
 
-                            <div class="campo">
-                                <label class="campo__rotulo" for="vestimenta_<?php
-                                echo escaparGerenciamento($tipoSlot);
-                                ?>">
-                                    Equipamento:
-                                </label>
+                            <div class="slot-ficha__dados">
+                                <div class="campo">
+                                    <label class="campo__rotulo" for="pp_<?php
+                                    echo escaparGerenciamento($tipoSlot);
+                                    ?>">
+                                        PP atual:
+                                    </label>
 
-                                <select class="campo__controle" name="id_vestimenta"
-                                    id="vestimenta_<?php echo escaparGerenciamento($tipoSlot); ?>">
-                                    <option value="">
-                                        Espaço vazio
-                                    </option>
-
-                                    <?php foreach (
-                                        $vestimentasDisponiveis
-                                        as $vestimentaDisponivel
-                                    ): ?>
-                                        <?php if (
-                                            $vestimentaDisponivel['tipo']
-                                            !== $tipoSlot
-                                        ): ?>
-                                            <?php continue; ?>
-                                        <?php endif; ?>
-
-                                        <option value="<?php
-                                        echo (int) $vestimentaDisponivel[
-                                            'id_vestimenta'
-                                        ];
-                                        ?>" <?php
-                                        if (
-                                            $vestimentaAtual !== null
-                                            && (int) $vestimentaAtual[
-                                                'id_vestimenta'
-                                            ]
-                                            === (int) $vestimentaDisponivel[
-                                                'id_vestimenta'
-                                            ]
-                                        ) {
-                                            echo 'selected';
-                                        }
-                                        ?>>
-                                            <?php
-                                            echo escaparGerenciamento(
-                                                $vestimentaDisponivel['nome']
-                                            );
-                                            ?>
-                                            —
-                                            <?php
-                                            echo (int) $vestimentaDisponivel[
-                                                'pontos_protecao_maximo'
-                                            ];
-                                            ?>
-                                            PP
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-                        </form>
-
-                        <?php if ($vestimentaAtual === null): ?>
-                            <p class="slot-ficha__vazio">
-                                Nenhuma vestimenta equipada neste espaço.
-                            </p>
-                        <?php else: ?>
-                            <form id="form_protecao_<?php echo escaparGerenciamento($tipoSlot); ?>"
-                                class="formulario slot-ficha__formulario" action="/Controllers/FichaController.php"
-                                method="POST">
-                                <input type="hidden" name="acao" value="atualizar_protecao">
-
-                                <input type="hidden" name="id_ficha" value="<?php echo (int) $ficha['id_ficha']; ?>">
-
-                                <input type="hidden" name="tipo_slot" value="<?php
-                                echo escaparGerenciamento($tipoSlot);
-                                ?>">
-
-                                <div class="slot-ficha__dados">
-                                    <div class="campo">
-                                        <label class="campo__rotulo" for="pp_<?php
+                                    <div class="campo-com-limite">
+                                        <input class="campo__controle" type="number" name="pontos_protecao_atual" id="pp_<?php
                                         echo escaparGerenciamento($tipoSlot);
+                                        ?>" min="0" max="<?php
+                                        echo (int) $vestimentaAtual[
+                                            'pontos_protecao_maximo'
+                                        ];
+                                        ?>" required value="<?php
+                                        echo (int) $vestimentaAtual[
+                                            'pontos_protecao_atual'
+                                        ];
                                         ?>">
-                                            PP atual:
-                                        </label>
 
-                                        <div class="campo-com-limite">
-                                            <input class="campo__controle" type="number" name="pontos_protecao_atual" id="pp_<?php
-                                            echo escaparGerenciamento($tipoSlot);
-                                            ?>" min="0" max="<?php
+                                        <span class="campo-com-limite__valor">
+                                            / <?php
                                             echo (int) $vestimentaAtual[
                                                 'pontos_protecao_maximo'
                                             ];
-                                            ?>" required value="<?php
-                                            echo (int) $vestimentaAtual[
-                                                'pontos_protecao_atual'
-                                            ];
-                                            ?>">
-
-                                            <span class="campo-com-limite__valor">
-                                                / <?php
-                                                echo (int) $vestimentaAtual[
-                                                    'pontos_protecao_maximo'
-                                                ];
-                                                ?>
-                                            </span>
-                                        </div>
+                                            ?>
+                                        </span>
                                     </div>
-
-                                    <?php if (!empty($vestimentaAtual['dano'])): ?>
-                                        <p>
-                                            <strong>Dano:</strong>
-
-                                            <?php
-                                            echo escaparGerenciamento(
-                                                $vestimentaAtual['dano']
-                                            );
-                                            ?>
-                                        </p>
-                                    <?php endif; ?>
-
-                                    <?php if (!empty($vestimentaAtual['elemento'])): ?>
-                                        <p>
-                                            <strong>Elemento:</strong>
-
-                                            <?php
-                                            echo escaparGerenciamento(
-                                                $vestimentaAtual['elemento']
-                                            );
-                                            ?>
-                                        </p>
-                                    <?php endif; ?>
                                 </div>
 
-                                <p class="observacao-ficha">
-                                    Definir o PP como zero destruirá e removerá
-                                    a vestimenta.
-                                </p>
-                            </form>
-
-                            <?php if (!empty($vestimentaAtual['especial'])): ?>
-                                <div class="slot-ficha__especial">
-                                    <strong>Especial:</strong>
-
+                                <?php if (!empty($vestimentaAtual['dano'])): ?>
                                     <p>
+                                        <strong>Dano:</strong>
+
                                         <?php
-                                        echo nl2br(
-                                            escaparGerenciamento(
-                                                $vestimentaAtual['especial']
-                                            )
+                                        echo escaparGerenciamento(
+                                            $vestimentaAtual['dano']
                                         );
                                         ?>
                                     </p>
-                                </div>
-                            <?php endif; ?>
-                        <?php endif; ?>
+                                <?php endif; ?>
 
-                        <div class="slot-ficha__acoes">
-                            <button class="botao botao--secundario" type="submit" form="form_equipar_<?php
+                                <?php if (!empty($vestimentaAtual['elemento'])): ?>
+                                    <p>
+                                        <strong>Elemento:</strong>
+
+                                        <?php
+                                        echo escaparGerenciamento(
+                                            $vestimentaAtual['elemento']
+                                        );
+                                        ?>
+                                    </p>
+                                <?php endif; ?>
+                            </div>
+
+                            <p class="observacao-ficha">
+                                Definir o PP como zero destruirá e removerá
+                                a vestimenta.
+                            </p>
+                        </form>
+
+                        <?php if (!empty($vestimentaAtual['especial'])): ?>
+                            <div class="slot-ficha__especial">
+                                <strong>Especial:</strong>
+
+                                <p>
+                                    <?php
+                                    echo nl2br(
+                                        escaparGerenciamento(
+                                            $vestimentaAtual['especial']
+                                        )
+                                    );
+                                    ?>
+                                </p>
+                            </div>
+                        <?php endif; ?>
+                    <?php endif; ?>
+
+                    <div class="slot-ficha__acoes">
+                        <button class="botao botao--secundario" type="submit" form="form_equipar_<?php
+                        echo escaparGerenciamento($tipoSlot);
+                        ?>">
+                            Salvar equipamento
+                        </button>
+
+                        <?php if ($vestimentaAtual !== null): ?>
+                            <button class="botao botao--primario" type="submit" form="form_protecao_<?php
                             echo escaparGerenciamento($tipoSlot);
                             ?>">
-                                Salvar equipamento
+                                Atualizar proteção
                             </button>
+                        <?php endif; ?>
+                    </div>
 
-                            <?php if ($vestimentaAtual !== null): ?>
-                                <button class="botao botao--primario" type="submit" form="form_protecao_<?php
-                                echo escaparGerenciamento($tipoSlot);
-                                ?>">
-                                    Atualizar proteção
-                                </button>
-                            <?php endif; ?>
-                        </div>
-                    </article>
-                <?php endforeach; ?>
+                </article>
+            <?php endforeach; ?>
             </div>
         </section>
 
@@ -949,7 +952,7 @@ function escaparGerenciamento(mixed $valor): string
                                         echo 'selected';
                                     }
                                     ?>>
-         Material
+                          Material
                                     </option>
 
                                     <option value="UTILITARIO" <?php
@@ -1056,304 +1059,302 @@ function escaparGerenciamento(mixed $valor): string
                 </div>
             </section>
 
-        </section>
+            <hr>
 
-        <hr>
+            <section class="secao-ficha" id="magias">
+                <header class="secao-ficha__cabecalho secao-ficha__cabecalho--com-acao">
+                    <div class="secao-ficha__introducao">
+                        <p class="secao-ficha__etapa">
+                            Conhecimentos arcanos
+                        </p>
 
-        <section class="secao-ficha" id="magias">
-            <header class="secao-ficha__cabecalho secao-ficha__cabecalho--com-acao">
-                <div class="secao-ficha__introducao">
-                    <p class="secao-ficha__etapa">
-                        Conhecimentos arcanos
-                    </p>
+                        <h2 class="secao-ficha__titulo">
+                            Magias aprendidas
+                        </h2>
 
-                    <h2 class="secao-ficha__titulo">
-                        Magias aprendidas
-                    </h2>
+                        <p class="secao-ficha__descricao">
+                            Consulte as magias conhecidas pelo personagem
+                            e aprenda novas magias disponíveis.
+                        </p>
+                    </div>
 
-                    <p class="secao-ficha__descricao">
-                        Consulte as magias conhecidas pelo personagem
-                        e aprenda novas magias disponíveis.
-                    </p>
-                </div>
+                    <?php if ($podeUsarMagias): ?>
+                        <a class="botao botao--secundario botao--pequeno" href="/Controllers/MagiaController.php?acao=novo"
+                            target="_blank" rel="noopener">
+                            Cadastrar magia
+                        </a>
+                    <?php endif; ?>
+                </header>
 
-                <?php if ($podeUsarMagias): ?>
-                    <a class="botao botao--secundario botao--pequeno" href="/Controllers/MagiaController.php?acao=novo"
-                        target="_blank" rel="noopener">
-                        Cadastrar magia
-                    </a>
-                <?php endif; ?>
-            </header>
-
-            <?php if (!$podeUsarMagias): ?>
-                <p class="slot-ficha__vazio">
-                    A profissão deste personagem não concede acesso a magias.
-                </p>
-            <?php else: ?>
-                <?php if (empty($magias)): ?>
+                <?php if (!$podeUsarMagias): ?>
                     <p class="slot-ficha__vazio">
-                        O personagem ainda não conhece nenhuma magia.
+                        A profissão deste personagem não concede acesso a magias.
                     </p>
                 <?php else: ?>
-                    <div class="grade-magias-ficha">
-                        <?php foreach ($magias as $magia): ?>
-                            <article class="magia-ficha">
-                                <header class="magia-ficha__cabecalho">
-                                    <h3 class="magia-ficha__titulo">
-                                        <?php
-                                        echo escaparGerenciamento(
-                                            $magia['nome']
-                                        );
+                    <?php if (empty($magias)): ?>
+                        <p class="slot-ficha__vazio">
+                            O personagem ainda não conhece nenhuma magia.
+                        </p>
+                    <?php else: ?>
+                        <div class="grade-magias-ficha">
+                            <?php foreach ($magias as $magia): ?>
+                                <article class="magia-ficha">
+                                    <header class="magia-ficha__cabecalho">
+                                        <h3 class="magia-ficha__titulo">
+                                            <?php
+                                            echo escaparGerenciamento(
+                                                $magia['nome']
+                                            );
+                                            ?>
+                                        </h3>
+
+                                        <p class="magia-ficha__elemento">
+                                            <strong>Elemento:</strong>
+
+                                            <?php
+                                            echo escaparGerenciamento(
+                                                $magia['elemento']
+                                            );
+                                            ?>
+                                        </p>
+                                    </header>
+
+                                    <?php if (!empty($magia['descricao'])): ?>
+                                        <div class="magia-ficha__descricao">
+                                            <p>
+                                                <?php
+                                                echo nl2br(
+                                                    escaparGerenciamento(
+                                                        $magia['descricao']
+                                                    )
+                                                );
+                                                ?>
+                                            </p>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <div class="magia-ficha__acoes">
+                                        <form action="/Controllers/FichaController.php" method="POST" onsubmit="
+                                    return confirm(
+                                        'Remover esta magia da ficha?'
+                                    );
+                                ">
+                                            <input type="hidden" name="acao" value="remover_magia">
+
+                                            <input type="hidden" name="id_ficha" value="<?php
+                                            echo (int) $ficha['id_ficha'];
+                                            ?>">
+
+                                            <input type="hidden" name="id_magia" value="<?php
+                                            echo (int) $magia['id_magia'];
+                                            ?>">
+
+                                            <button class="botao botao--perigo botao--pequeno" type="submit">
+                                                Remover magia
+                                            </button>
+                                        </form>
+                                    </div>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="aprendizado-magia">
+                        <h3 class="aprendizado-magia__titulo">
+                            Aprender uma magia
+                        </h3>
+
+                        <p class="aprendizado-magia__descricao">
+                            Escolha uma das magias disponíveis para adicioná-la
+                            aos conhecimentos do personagem.
+                        </p>
+
+                        <?php if (empty($magiasDisponiveis)): ?>
+                            <p class="slot-ficha__vazio">
+                                Não existem outras magias disponíveis.
+                            </p>
+                        <?php else: ?>
+                            <form class="formulario" action="/Controllers/FichaController.php" method="POST">
+                                <input type="hidden" name="acao" value="adicionar_magia">
+
+                                <input type="hidden" name="id_ficha" value="<?php
+                                echo (int) $ficha['id_ficha'];
+                                ?>">
+
+                                <div class="campo">
+                                    <label class="campo__rotulo" for="id_magia">
+                                        Magia:
+                                    </label>
+
+                                    <select class="campo__controle" name="id_magia" id="id_magia" required>
+                                        <option value="">
+                                            Selecione uma magia
+                                        </option>
+
+                                        <?php foreach (
+                                            $magiasDisponiveis
+                                            as $magiaDisponivel
+                                        ): ?>
+                                            <option value="<?php
+                                            echo (int) $magiaDisponivel['id_magia'];
+                                            ?>">
+                                                <?php
+                                                echo escaparGerenciamento(
+                                                    $magiaDisponivel['nome']
+                                                    . ' — '
+                                                    . $magiaDisponivel['elemento']
+                                                );
+                                                ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                </div>
+
+                                <div class="formulario__acoes">
+                                    <button class="botao botao--primario" type="submit">
+                                        Aprender magia
+                                    </button>
+                                </div>
+                            </form>
+                        <?php endif; ?>
+                    </div>
+                <?php endif; ?>
+            </section>
+
+            <hr>
+
+            <section class="secao-ficha" id="companheiro">
+                <header class="secao-ficha__cabecalho secao-ficha__cabecalho--com-acao">
+                    <div class="secao-ficha__introducao">
+                        <p class="secao-ficha__etapa">
+                            Aliado da jornada
+                        </p>
+
+                        <h2 class="secao-ficha__titulo">
+                            Companheiro animal
+                        </h2>
+
+                        <p class="secao-ficha__descricao">
+                            Consulte as características do companheiro e atualize
+                            as informações que podem mudar durante a aventura.
+                        </p>
+                    </div>
+
+                    <a class="botao botao--secundario botao--pequeno"
+                        href="/Controllers/CompanheiroAnimalController.php?acao=novo" target="_blank" rel="noopener">
+                        Cadastrar companheiro
+                    </a>
+                </header>
+
+                <?php if ($companheiro === null): ?>
+                    <p class="slot-ficha__vazio">
+                        Este personagem não possui companheiro animal.
+                    </p>
+                <?php else: ?>
+                    <form class="formulario formulario-dados-ficha" action="/Controllers/FichaController.php" method="POST">
+                        <input type="hidden" name="acao" value="atualizar_companheiro">
+
+                        <input type="hidden" name="id_ficha" value="<?php echo (int) $ficha['id_ficha']; ?>">
+
+                        <div class="grade-dados-personagem">
+                            <div class="campo">
+                                <label class="campo__rotulo" for="nome_companheiro">
+                                    Nome do companheiro:
+                                </label>
+
+                                <input class="campo__controle" type="text" name="nome_companheiro" id="nome_companheiro"
+                                    maxlength="100" required value="<?php
+                                    echo escaparGerenciamento(
+                                        $companheiro['nome']
+                                    );
+                                    ?>">
+                            </div>
+
+                            <div class="dado-ficha">
+                                <span class="dado-ficha__rotulo">
+                                    Tipo
+                                </span>
+
+                                <strong class="dado-ficha__valor">
+                                    <?php
+                                    echo escaparGerenciamento(
+                                        $companheiro['tipo']
+                                    );
+                                    ?>
+                                </strong>
+
+                                <span class="dado-ficha__ajuda">
+                                    Definido pelo companheiro escolhido.
+                                </span>
+                            </div>
+
+                            <div class="campo">
+                                <label class="campo__rotulo" for="pv_companheiro">
+                                    PV atual:
+                                </label>
+
+                                <div class="campo-com-limite">
+                                    <input class="campo__controle" type="number" name="pv_companheiro" id="pv_companheiro"
+                                        min="0" max="<?php
+                                        echo (int) $companheiro['pv_maximo'];
+                                        ?>" required value="<?php
+                                        echo (int) $companheiro['pv_atual'];
+                                        ?>">
+
+                                    <span class="campo-com-limite__valor">
+                                        / <?php
+                                        echo (int) $companheiro['pv_maximo'];
                                         ?>
-                                    </h3>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
 
-                                    <p class="magia-ficha__elemento">
-                                        <strong>Elemento:</strong>
+                        <?php if (
+                            !empty($companheiro['dano'])
+                            || !empty($companheiro['descricao'])
+                        ): ?>
+                            <div class="companheiro-ficha__detalhes">
+                                <?php if (!empty($companheiro['dano'])): ?>
+                                    <p class="companheiro-ficha__dano">
+                                        <strong>Dano:</strong>
 
                                         <?php
                                         echo escaparGerenciamento(
-                                            $magia['elemento']
+                                            $companheiro['dano']
                                         );
                                         ?>
                                     </p>
-                                </header>
+                                <?php endif; ?>
 
-                                <?php if (!empty($magia['descricao'])): ?>
-                                    <div class="magia-ficha__descricao">
+                                <?php if (
+                                    !empty($companheiro['descricao'])
+                                ): ?>
+                                    <div class="companheiro-ficha__descricao">
+                                        <strong>Descrição:</strong>
+
                                         <p>
                                             <?php
                                             echo nl2br(
                                                 escaparGerenciamento(
-                                                    $magia['descricao']
+                                                    $companheiro['descricao']
                                                 )
                                             );
                                             ?>
                                         </p>
                                     </div>
                                 <?php endif; ?>
+                            </div>
+                        <?php endif; ?>
 
-                                <div class="magia-ficha__acoes">
-                                    <form action="/Controllers/FichaController.php" method="POST" onsubmit="
-                                return confirm(
-                                    'Remover esta magia da ficha?'
-                                );
-                            ">
-                                        <input type="hidden" name="acao" value="remover_magia">
-
-                                        <input type="hidden" name="id_ficha" value="<?php
-                                        echo (int) $ficha['id_ficha'];
-                                        ?>">
-
-                                        <input type="hidden" name="id_magia" value="<?php
-                                        echo (int) $magia['id_magia'];
-                                        ?>">
-
-                                        <button class="botao botao--perigo botao--pequeno" type="submit">
-                                            Remover magia
-                                        </button>
-                                    </form>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
-                    </div>
+                        <div class="formulario__acoes">
+                            <button class="botao botao--primario" type="submit">
+                                Salvar companheiro
+                            </button>
+                        </div>
+                    </form>
                 <?php endif; ?>
-
-                <div class="aprendizado-magia">
-                    <h3 class="aprendizado-magia__titulo">
-                        Aprender uma magia
-                    </h3>
-
-                    <p class="aprendizado-magia__descricao">
-                        Escolha uma das magias disponíveis para adicioná-la
-                        aos conhecimentos do personagem.
-                    </p>
-
-                    <?php if (empty($magiasDisponiveis)): ?>
-                        <p class="slot-ficha__vazio">
-                            Não existem outras magias disponíveis.
-                        </p>
-                    <?php else: ?>
-                        <form class="formulario" action="/Controllers/FichaController.php" method="POST">
-                            <input type="hidden" name="acao" value="adicionar_magia">
-
-                            <input type="hidden" name="id_ficha" value="<?php
-                            echo (int) $ficha['id_ficha'];
-                            ?>">
-
-                            <div class="campo">
-                                <label class="campo__rotulo" for="id_magia">
-                                    Magia:
-                                </label>
-
-                                <select class="campo__controle" name="id_magia" id="id_magia" required>
-                                    <option value="">
-                                        Selecione uma magia
-                                    </option>
-
-                                    <?php foreach (
-                                        $magiasDisponiveis
-                                        as $magiaDisponivel
-                                    ): ?>
-                                        <option value="<?php
-                                        echo (int) $magiaDisponivel['id_magia'];
-                                        ?>">
-                                            <?php
-                                            echo escaparGerenciamento(
-                                                $magiaDisponivel['nome']
-                                                . ' — '
-                                                . $magiaDisponivel['elemento']
-                                            );
-                                            ?>
-                                        </option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </div>
-
-                            <div class="formulario__acoes">
-                                <button class="botao botao--primario" type="submit">
-                                    Aprender magia
-                                </button>
-                            </div>
-                        </form>
-                    <?php endif; ?>
-                </div>
-            <?php endif; ?>
-        </section>
-
-        <hr>
-
-        <section class="secao-ficha" id="companheiro">
-            <header class="secao-ficha__cabecalho secao-ficha__cabecalho--com-acao">
-                <div class="secao-ficha__introducao">
-                    <p class="secao-ficha__etapa">
-                        Aliado da jornada
-                    </p>
-
-                    <h2 class="secao-ficha__titulo">
-                        Companheiro animal
-                    </h2>
-
-                    <p class="secao-ficha__descricao">
-                        Consulte as características do companheiro e atualize
-                        as informações que podem mudar durante a aventura.
-                    </p>
-                </div>
-
-                <a class="botao botao--secundario botao--pequeno"
-                    href="/Controllers/CompanheiroAnimalController.php?acao=novo" target="_blank" rel="noopener">
-                    Cadastrar companheiro
-                </a>
-            </header>
-
-            <?php if ($companheiro === null): ?>
-                <p class="slot-ficha__vazio">
-                    Este personagem não possui companheiro animal.
-                </p>
-            <?php else: ?>
-                <form class="formulario formulario-dados-ficha" action="/Controllers/FichaController.php" method="POST">
-                    <input type="hidden" name="acao" value="atualizar_companheiro">
-
-                    <input type="hidden" name="id_ficha" value="<?php echo (int) $ficha['id_ficha']; ?>">
-
-                    <div class="grade-dados-personagem">
-                        <div class="campo">
-                            <label class="campo__rotulo" for="nome_companheiro">
-                                Nome do companheiro:
-                            </label>
-
-                            <input class="campo__controle" type="text" name="nome_companheiro" id="nome_companheiro"
-                                maxlength="100" required value="<?php
-                                echo escaparGerenciamento(
-                                    $companheiro['nome']
-                                );
-                                ?>">
-                        </div>
-
-                        <div class="dado-ficha">
-                            <span class="dado-ficha__rotulo">
-                                Tipo
-                            </span>
-
-                            <strong class="dado-ficha__valor">
-                                <?php
-                                echo escaparGerenciamento(
-                                    $companheiro['tipo']
-                                );
-                                ?>
-                            </strong>
-
-                            <span class="dado-ficha__ajuda">
-                                Definido pelo companheiro escolhido.
-                            </span>
-                        </div>
-
-                        <div class="campo">
-                            <label class="campo__rotulo" for="pv_companheiro">
-                                PV atual:
-                            </label>
-
-                            <div class="campo-com-limite">
-                                <input class="campo__controle" type="number" name="pv_companheiro" id="pv_companheiro"
-                                    min="0" max="<?php
-                                    echo (int) $companheiro['pv_maximo'];
-                                    ?>" required value="<?php
-                                    echo (int) $companheiro['pv_atual'];
-                                    ?>">
-
-                                <span class="campo-com-limite__valor">
-                                    / <?php
-                                    echo (int) $companheiro['pv_maximo'];
-                                    ?>
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <?php if (
-                        !empty($companheiro['dano'])
-                        || !empty($companheiro['descricao'])
-                    ): ?>
-                        <div class="companheiro-ficha__detalhes">
-                            <?php if (!empty($companheiro['dano'])): ?>
-                                <p class="companheiro-ficha__dano">
-                                    <strong>Dano:</strong>
-
-                                    <?php
-                                    echo escaparGerenciamento(
-                                        $companheiro['dano']
-                                    );
-                                    ?>
-                                </p>
-                            <?php endif; ?>
-
-                            <?php if (
-                                !empty($companheiro['descricao'])
-                            ): ?>
-                                <div class="companheiro-ficha__descricao">
-                                    <strong>Descrição:</strong>
-
-                                    <p>
-                                        <?php
-                                        echo nl2br(
-                                            escaparGerenciamento(
-                                                $companheiro['descricao']
-                                            )
-                                        );
-                                        ?>
-                                    </p>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <div class="formulario__acoes">
-                        <button class="botao botao--primario" type="submit">
-                            Salvar companheiro
-                        </button>
-                    </div>
-                </form>
-            <?php endif; ?>
-        </section>
+            </section>
 
     </main>
 </body>

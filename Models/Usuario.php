@@ -48,4 +48,53 @@ class Usuario
 
         return $comando->fetch(PDO::FETCH_ASSOC);
     }
+
+    public function buscarPorId(int $idUsuario)
+    {
+        $sql = "SELECT
+                id_usuario,
+                nome,
+                email,
+                senha,
+                ativo
+            FROM usuario
+            WHERE id_usuario = :id_usuario";
+
+        $comando = $this->conexao->prepare($sql);
+        $comando->bindValue(
+            ":id_usuario",
+            $idUsuario,
+            PDO::PARAM_INT
+        );
+        $comando->execute();
+
+        return $comando->fetch(PDO::FETCH_ASSOC);
+    }
+
+    public function desativar(int $idUsuario): bool
+    {
+        /*
+         * O e-mail interno libera o endereço original para um novo
+         * cadastro, mas mantém o usuário relacionado aos seus dados.
+         */
+        $sql = "UPDATE usuario
+            SET ativo = FALSE,
+                email = CONCAT(
+                    'conta_desativada_',
+                    id_usuario
+                )
+            WHERE id_usuario = :id_usuario
+              AND ativo = TRUE";
+
+        $comando = $this->conexao->prepare($sql);
+        $comando->bindValue(
+            ":id_usuario",
+            $idUsuario,
+            PDO::PARAM_INT
+        );
+
+        $resultado = $comando->execute();
+
+        return $resultado && $comando->rowCount() === 1;
+    }
 }

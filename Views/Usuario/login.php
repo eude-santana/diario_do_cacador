@@ -1,6 +1,9 @@
 <?php
 
 $erro = $_GET["erro"] ?? "";
+
+$sucesso = $_GET["sucesso"] ?? "";
+
 ?>
 
 <!DOCTYPE html>
@@ -34,6 +37,15 @@ $erro = $_GET["erro"] ?? "";
                     Acesse suas fichas, profissões e registros de campanha.
                 </p>
             </header>
+
+            <?php if ($sucesso === "conta_desativada"): ?>
+                <div class="mensagem mensagem--sucesso" role="status">
+                    <p>
+                        Conta desativada. Seu acesso foi encerrado e o
+                        e-mail pode ser utilizado em um novo cadastro.
+                    </p>
+                </div>
+            <?php endif; ?>
 
             <?php if ($erro === "campos"): ?>
                 <div class="mensagem mensagem--erro" role="alert">
