@@ -16,6 +16,107 @@ if (!is_string($acao)) {
     exit;
 }
 
+if ($acao === "desativar") {
+    if (!isset($_SESSION["id_usuario"])) {
+        header("Location: ../Views/Usuario/login.php");
+        exit;
+    }
+
+    $senhaAtual = $_POST["senha_atual"] ?? "";
+    $confirmacao = $_POST["confirmar_desativacao"] ?? "";
+
+    if (
+        !is_string($senhaAtual) ||
+        !is_string($confirmacao)
+    ) {
+        header(
+            "Location: ../Views/Usuario/desativar.php"
+            . "?erro=campos"
+        );
+        exit;
+    }
+
+    if ($senhaAtual === "") {
+        header(
+            "Location: ../Views/Usuario/desativar.php"
+            . "?erro=senha"
+        );
+        exit;
+    }
+
+    if ($confirmacao !== "1") {
+        header(
+            "Location: ../Views/Usuario/desativar.php"
+            . "?erro=confirmacao"
+        );
+        exit;
+    }
+
+    try {
+        $usuarioModel = new Usuario();
+
+        $idUsuario = (int) $_SESSION["id_usuario"];
+
+        $usuario = $usuarioModel->buscarPorId(
+            $idUsuario
+        );
+
+        if (
+            !$usuario ||
+            !$usuario["ativo"] ||
+            !password_verify(
+                $senhaAtual,
+                $usuario["senha"]
+            )
+        ) {
+            header(
+                "Location: ../Views/Usuario/desativar.php"
+                . "?erro=senha_incorreta"
+            );
+            exit;
+        }
+
+        $desativou = $usuarioModel->desativar(
+            $idUsuario
+        );
+
+        if (!$desativou) {
+            header(
+                "Location: ../Views/Usuario/desativar.php"
+                . "?erro=desativacao"
+            );
+            exit;
+        }
+
+        session_unset();
+        session_destroy();
+
+        header(
+            "Location: ../Views/Usuario/login.php"
+            . "?sucesso=conta_desativada"
+        );
+        exit;
+
+    } catch (PDOException $erro) {
+        error_log($erro->getMessage());
+
+        header(
+            "Location: ../Views/Usuario/desativar.php"
+            . "?erro=desativacao"
+        );
+        exit;
+    }
+}
+
+/*
+ * Impede que uma ação desconhecida seja tratada
+ * como cadastro de usuário.
+ */
+if ($acao !== "cadastrar") {
+    header("Location: ../Views/Usuario/cadastro.php");
+    exit;
+}
+
 $nome = $_POST["nome"] ?? "";
 $email = $_POST["email"] ?? "";
 $senha = $_POST["senha"] ?? "";

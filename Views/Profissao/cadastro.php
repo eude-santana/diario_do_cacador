@@ -633,4 +633,135 @@ $nomesTiposItem = [
         </form>
     </main>
 
+    <script>
+        const formProfissao =
+            document.getElementById("form-profissao");
+
+        const vantagem1 =
+            document.getElementById("vantagem_1");
+
+        const vantagem2 =
+            document.getElementById("vantagem_2");
+
+        const erroVantagens =
+            document.getElementById("erro-vantagens");
+
+        function validarVantagens() {
+            if (!vantagem1 || !vantagem2) {
+                return true;
+            }
+
+            if (
+                vantagem1.value !== "" &&
+                vantagem1.value === vantagem2.value
+            ) {
+                if (erroVantagens) {
+                    erroVantagens.textContent =
+                        "As duas vantagens devem ser diferentes.";
+                }
+
+                vantagem2.setCustomValidity(
+                    "Selecione uma vantagem diferente."
+                );
+
+                return false;
+            }
+
+            if (erroVantagens) {
+                erroVantagens.textContent = "";
+            }
+
+            vantagem2.setCustomValidity("");
+
+            return true;
+        }
+
+        if (vantagem1 && vantagem2) {
+            vantagem1.addEventListener(
+                "change",
+                validarVantagens
+            );
+
+            vantagem2.addEventListener(
+                "change",
+                validarVantagens
+            );
+
+            formProfissao.addEventListener(
+                "submit",
+                validarVantagens
+            );
+        }
+
+        const pesquisaItem =
+            document.getElementById("pesquisa_item");
+
+        const filtroTipoItem =
+            document.getElementById("filtro_tipo_item");
+
+        const linhasItens =
+            document.querySelectorAll(".linha-item");
+
+        const mensagemSemItens =
+            document.getElementById("mensagem_sem_itens");
+
+        function filtrarItens() {
+            if (!pesquisaItem || !filtroTipoItem) {
+                return;
+            }
+
+            const textoPesquisado =
+                pesquisaItem.value
+                    .trim()
+                    .toLocaleLowerCase();
+
+            const tipoSelecionado =
+                filtroTipoItem.value;
+
+            let quantidadeVisivel = 0;
+
+            linhasItens.forEach(function (linha) {
+                const nomeItem =
+                    linha.dataset.nome.toLocaleLowerCase();
+
+                const tipoItem =
+                    linha.dataset.tipo;
+
+                const correspondeNome =
+                    nomeItem.includes(textoPesquisado);
+
+                const correspondeTipo =
+                    tipoSelecionado === "" ||
+                    tipoItem === tipoSelecionado;
+
+                const deveMostrar =
+                    correspondeNome && correspondeTipo;
+
+                linha.hidden = !deveMostrar;
+
+                if (deveMostrar) {
+                    quantidadeVisivel++;
+                }
+            });
+
+            if (mensagemSemItens) {
+                mensagemSemItens.hidden =
+                    quantidadeVisivel !== 0;
+            }
+        }
+
+        if (pesquisaItem && filtroTipoItem) {
+            pesquisaItem.addEventListener(
+                "input",
+                filtrarItens
+            );
+
+            filtroTipoItem.addEventListener(
+                "change",
+                filtrarItens
+            );
+        }
+    </script>
+</body>
+
 </html>
