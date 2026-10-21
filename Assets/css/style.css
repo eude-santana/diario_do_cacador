@@ -2197,6 +2197,14 @@ textarea.campo__controle {
     .slot-ficha__acoes .botao {
         flex: 1;
     }
+
+    .referencia-original {
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .referencia-original__link {
+        width: auto;
+    }
 }
 
 @media (min-width: 72rem) {
@@ -2249,6 +2257,50 @@ textarea.campo__controle {
     height: 1.1rem;
     margin: 0.2rem 0 0;
     accent-color: var(--cor-perigo);
+}
+
+.referencia-original {
+    display: grid;
+    align-items: center;
+    gap: var(--espaco-4);
+    padding: var(--espaco-5);
+    margin-top: var(--espaco-7);
+    background-color: var(--cor-papel-secundario);
+    background-image: var(--textura-papel);
+    border-top: 1px solid var(--cor-borda);
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.referencia-original__conteudo {
+    display: grid;
+    gap: var(--espaco-2);
+}
+
+.referencia-original__marca {
+    margin: 0;
+    color: var(--cor-cobre);
+    font-size: var(--texto-pequeno);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.referencia-original__titulo {
+    margin: 0;
+    color: var(--cor-primaria);
+    font-family: var(--fonte-titulos);
+    font-size: var(--titulo-menor);
+}
+
+.referencia-original__descricao {
+    max-width: 48rem;
+    margin: 0;
+    color: var(--cor-tinta-suave);
+}
+
+.referencia-original__link {
+    width: 100%;
+    justify-content: center;
 }
 
 /* =========================================================

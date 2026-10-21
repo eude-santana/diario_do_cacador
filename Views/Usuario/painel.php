@@ -172,6 +172,30 @@ exigirLogin();
                 Desativar conta
             </a>
         </section>
+
+        <footer class="referencia-original" aria-labelledby="titulo-referencia-original">
+            <div class="referencia-original__conteudo">
+                <p class="referencia-original__marca">
+                    Obra original
+                </p>
+
+                <h2 class="referencia-original__titulo" id="titulo-referencia-original">
+                    Conheça o RPG Diário do Caçador
+                </h2>
+
+                <p class="referencia-original__descricao">
+                    Este é um projeto acadêmico independente, desenvolvido
+                    com base no RPG solo Diário do Caçador, publicado pela
+                    Coisinha Verde.
+                </p>
+            </div>
+
+            <a class="botao botao--secundario referencia-original__link"
+                href="https://coisinhaverde.com.br/jogos/portfolio/diario-do-cacador/" target="_blank"
+                rel="noopener noreferrer">
+                Acessar a página oficial
+            </a>
+        </footer>
     </main>
 </body>
 
